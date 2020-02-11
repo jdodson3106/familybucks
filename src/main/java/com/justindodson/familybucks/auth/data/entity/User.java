@@ -1,4 +1,4 @@
-package com.justindodson.familybucks.data.entity;
+package com.justindodson.familybucks.auth.data.entity;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;

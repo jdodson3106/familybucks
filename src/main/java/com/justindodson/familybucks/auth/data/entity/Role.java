@@ -1,4 +1,4 @@
-package com.justindodson.familybucks.data.entity;
+package com.justindodson.familybucks.auth.data.entity;
 
 import javax.persistence.*;
 import java.util.Objects;

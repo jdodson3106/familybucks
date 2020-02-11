@@ -1,6 +1,6 @@
-package com.justindodson.familybucks.data.repository;
+package com.justindodson.familybucks.auth.data.repository;
 
-import com.justindodson.familybucks.data.entity.User;
+import com.justindodson.familybucks.auth.data.entity.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
