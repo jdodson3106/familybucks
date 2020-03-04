@@ -1,13 +1,11 @@
 package com.justindodson.familybucks.app.model.entity.user;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@DiscriminatorValue("parent")
 public class Parent extends Person{
 
     @ManyToMany

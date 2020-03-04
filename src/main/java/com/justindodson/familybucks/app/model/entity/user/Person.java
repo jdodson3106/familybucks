@@ -1,13 +1,15 @@
 package com.justindodson.familybucks.app.model.entity.user;
 
+import com.justindodson.familybucks.app.model.entity.BaseEntity;
 import org.hibernate.validator.constraints.Currency;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 
-@MappedSuperclass
-public class Person extends Family {
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "person_type")
+public abstract class Person extends BaseEntity {
 
     @Column(name = "first_name")
     @NotEmpty
@@ -16,6 +18,10 @@ public class Person extends Family {
     @Column(name = "last_name")
     @NotEmpty
     private String lastName;
+
+    @ManyToOne
+    @JoinColumn(name = "family_id", nullable = false)
+    private Family family;
 
     public String getFirstName() {
         return firstName;
