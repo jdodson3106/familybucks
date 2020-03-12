@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/base :: head"></head>
+<head>
+    <meta charset="UTF-8">
+    <title>Loging</title>
+</head>
+<body>
+
+<div th:replace="fragments/base :: navbar"></div>
+
+    <div class="container">
+        <div class="jumbotron">
+            <h1>Log In</h1><hr>
+            <form th:action="@{/login}" method="post">
+                <input class="form-control" type="text" name="username" placeholder="Username"><br>
+                <input class="form-control" type="password" name="password" placeholder="Password"><br>
+                <input class="btn btn-lg btn-primary" type="submit" value="Login">
+            </form>
+        </div>
+
+    </div>
+
+    <div th:replace="fragments/base :: bootstrap-javascript-resources"></div>
+</body>
+</html>

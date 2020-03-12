@@ -7,6 +7,7 @@ import com.justindodson.familybucks.app.auth.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.Optional;
 public class ParentService {
 
     private static final Logger logger = LoggerFactory.getLogger(ParentService.class);
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(11);
 
     private final UserRepository parentRepository;
 
@@ -27,13 +29,20 @@ public class ParentService {
     }
 
     // saves or updates given parent object. if the parent parameter is null it will throw and exception.
-    public void createOrUpdateParent(Parent parent) {
+    public Parent createOrUpdateParent(Parent parent) {
+        Optional<User> foundParent = parentRepository.findByUsername(parent.getUsername());
+
         try{
-            parentRepository.save(parent);
+            String password = encoder.encode(parent.getPassword1());
+            parent.setPassword1(password);
+            parent.setPassword2(password);
+            return parentRepository.save(parent);
+
         } catch (IllegalArgumentException ae) {
             ae.printStackTrace();
             logger.info("Parent entity with id: " + parent.getId() +" not found.");
         }
+        return null;
     }
 
     // return list of parent objects

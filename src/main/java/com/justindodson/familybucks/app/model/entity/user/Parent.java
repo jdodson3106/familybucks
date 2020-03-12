@@ -21,6 +21,15 @@ public class Parent extends User {
     )
     private Set<Child> children = new HashSet<>();
 
+    public Parent() {
+        super();
+    }
+
+    public Parent(String username, String firstName, String lastName, String password1, String password2, Family family, String email) {
+        super(username, firstName, lastName, password1, password2, family);
+        this.email = email;
+    }
+
     public String getEmail() {
         return email;
     }

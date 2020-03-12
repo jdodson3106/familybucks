@@ -8,10 +8,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.List;
 
@@ -20,7 +23,7 @@ import java.util.List;
 @Slf4j
 public class ParentController {
 
-    private final Logger log = LoggerFactory.getLogger(ParentController.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(ParentController.class);
 
     @Autowired
     private ParentService parentService;
@@ -53,10 +56,13 @@ public class ParentController {
         return "redirect:/parents/all";
     }
 
-    @GetMapping("/home/{username}")
-    public String parentDashboard(@PathVariable(name = "username") String username, Model model) {
-        Parent parent = parentService.getParentByUsername(username);
+    @GetMapping("/home")
+    public String parentDashboard(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Parent parent = parentService.getParentByUsername(auth.getName());
         model.addAttribute("parent", parent);
         return "users/parent_dashboard";
+
+
     }
 }

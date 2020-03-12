@@ -33,6 +33,18 @@ public abstract class User extends BaseEntity {
     @JoinColumn(name = "family_id", nullable = true)
     private Family family;
 
+    public User() {
+    }
+
+    public User(String username, String firstName, String lastName, String password1, String password2, Family family) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.password1 = password1;
+        this.password2 = password2;
+        this.family = family;
+    }
+
     public String getFirstName() {
         return firstName;
     }

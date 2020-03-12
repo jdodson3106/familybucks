@@ -19,6 +19,13 @@ public class Family extends BaseEntity {
     @OneToMany(mappedBy = "family", cascade = CascadeType.ALL)
     public Set<User> familyMembers = new HashSet<>();
 
+    public Family() {}
+
+    public Family(String familyName) {
+        super();
+        this.familyName = familyName;
+    }
+
     public String getFamilyName() {
         return familyName;
     }

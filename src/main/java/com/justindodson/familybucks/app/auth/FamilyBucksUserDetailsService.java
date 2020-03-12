@@ -18,10 +18,10 @@ public class FamilyBucksUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        User user = this.userRepository.findByUsername(s).get();
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = this.userRepository.findByUsername(username).get();
         if(null == user) {
-            throw new UsernameNotFoundException("Cannot find useranme: " + s);
+            throw new UsernameNotFoundException("Cannot find username: " + username);
         }
 
         return new UserPrincipal(user);
