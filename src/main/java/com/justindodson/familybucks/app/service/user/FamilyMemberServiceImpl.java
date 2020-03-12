@@ -8,20 +8,20 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class FamilyMemberServiceImpl implements FamilyMemberService {
-    private final FamilyService familyService;
-    private final ParentService parentService;
+    private final FamilyServiceImpl familyService;
+    private final ParentServiceImpl parentServiceImpl;
 
     @Autowired
-    public FamilyMemberServiceImpl(FamilyService familyService, ParentService parentService) {
+    public FamilyMemberServiceImpl(FamilyServiceImpl familyService, ParentServiceImpl parentServiceImpl) {
         this.familyService = familyService;
-        this.parentService = parentService;
+        this.parentServiceImpl = parentServiceImpl;
     }
 
     @Override
     public void addUserToFamily(User user, Family family) {
         family.familyMembers.add(user);
         user.setFamily(family);
-        parentService.createOrUpdateParent((Parent) user);
+        parentServiceImpl.createOrUpdateParent((Parent) user);
         familyService.createNewFamily(family);
     }
 }

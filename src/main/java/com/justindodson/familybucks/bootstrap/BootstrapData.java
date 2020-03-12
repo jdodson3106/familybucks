@@ -5,7 +5,7 @@ import com.justindodson.familybucks.app.model.entity.user.Child;
 import com.justindodson.familybucks.app.model.entity.user.Family;
 import com.justindodson.familybucks.app.model.entity.user.Parent;
 import com.justindodson.familybucks.app.model.repository.user.FamilyRepository;
-import com.justindodson.familybucks.app.service.user.ParentService;
+import com.justindodson.familybucks.app.service.user.ParentServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -14,13 +14,13 @@ import org.springframework.stereotype.Component;
 public class BootstrapData implements CommandLineRunner {
     private final UserRepository userRepository;
     private final FamilyRepository familyRepository;
-    private final ParentService parentService;
+    private final ParentServiceImpl parentServiceImpl;
 
     @Autowired
-    public BootstrapData(UserRepository userRepository, FamilyRepository familyRepository, ParentService parentService) {
+    public BootstrapData(UserRepository userRepository, FamilyRepository familyRepository, ParentServiceImpl parentServiceImpl) {
         this.userRepository = userRepository;
         this.familyRepository = familyRepository;
-        this.parentService = parentService;
+        this.parentServiceImpl = parentServiceImpl;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class BootstrapData implements CommandLineRunner {
         Family testFam = new Family("JD Family");
         Parent user = new Parent("admin", "Justin", "Dodson", "asdf", "asdf", testFam, "");
         testFam.familyMembers.add(user);
-        parentService.createOrUpdateParent(user);
+        parentServiceImpl.createOrUpdateParent(user);
         familyRepository.save(testFam);
 
         Family family = new Family("ThDodsons");
@@ -44,8 +44,8 @@ public class BootstrapData implements CommandLineRunner {
         family.familyMembers.add(child2);
         family.familyMembers.add(child3);
         family.familyMembers.add(child4);
-        parentService.createOrUpdateParent(parent);
-        parentService.createOrUpdateParent(parent2);
+        parentServiceImpl.createOrUpdateParent(parent);
+        parentServiceImpl.createOrUpdateParent(parent2);
         familyRepository.save(family);
         userRepository.save(child);
         userRepository.save(child2);
@@ -65,8 +65,8 @@ public class BootstrapData implements CommandLineRunner {
         family2.familyMembers.add(child6);
         family2.familyMembers.add(child7);
         family2.familyMembers.add(child8);
-        parentService.createOrUpdateParent(parent3);
-        parentService.createOrUpdateParent(parent4);
+        parentServiceImpl.createOrUpdateParent(parent3);
+        parentServiceImpl.createOrUpdateParent(parent4);
         familyRepository.save(family2);
         userRepository.save(child5);
         userRepository.save(child6);

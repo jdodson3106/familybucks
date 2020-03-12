@@ -4,6 +4,7 @@ import com.justindodson.familybucks.app.auth.User;
 import com.justindodson.familybucks.app.model.entity.user.Parent;
 import com.justindodson.familybucks.app.service.user.FamilyService;
 import com.justindodson.familybucks.app.service.user.ParentService;
+import com.justindodson.familybucks.app.service.user.ParentServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.List;
 
@@ -24,6 +24,7 @@ import java.util.List;
 public class ParentController {
 
     private final Logger LOGGER = LoggerFactory.getLogger(ParentController.class);
+
 
     @Autowired
     private ParentService parentService;
@@ -62,7 +63,16 @@ public class ParentController {
         Parent parent = parentService.getParentByUsername(auth.getName());
         model.addAttribute("parent", parent);
         return "users/parent_dashboard";
+    }
 
+    @GetMapping("/my-family")
+    public String familyStructure(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = parentService.getParentByUsername(auth.getName());
+        List<User> family = familyService.getAllFamilyMembers(user);
+        model.addAttribute("family", family);
+        model.addAttribute("family_name", user.getFamily().getFamilyName());
 
+        return "users/my_family";
     }
 }

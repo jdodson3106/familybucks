@@ -19,6 +19,7 @@ public class Parent extends User {
             joinColumns = @JoinColumn(name="parent_id"),
             inverseJoinColumns = @JoinColumn(name="child_id")
     )
+
     private Set<Child> children = new HashSet<>();
 
     public Parent() {

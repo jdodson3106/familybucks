@@ -6,10 +6,12 @@ import org.hibernate.validator.constraints.Currency;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import java.util.Comparator;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "person_type")
+@DiscriminatorValue(value = "user")
 public abstract class User extends BaseEntity {
 
     @Column(name = "first_name")
@@ -44,6 +46,26 @@ public abstract class User extends BaseEntity {
         this.password2 = password2;
         this.family = family;
     }
+
+    @Transient
+    public String getUserType() {
+        return this.getClass().getAnnotation(DiscriminatorValue.class).value();
+    }
+
+    public static Comparator<User> SORT_BY_PERSON_TYPE = new Comparator<User> () {
+
+        @Override
+        public int compare(User one, User two) {
+            return two.getUserType().compareTo(two.getUserType());
+        }
+    };
+
+    public static Comparator<User> SORT_BY_FIRST_NAME = new Comparator<User>() {
+        @Override
+        public int compare(User one, User two) {
+            return one.getFirstName().compareTo(two.getFirstName());
+        }
+    };
 
     public String getFirstName() {
         return firstName;

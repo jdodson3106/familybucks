@@ -15,7 +15,7 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav" sec:authorize="isAuthenticated()">
+        <ul class="navbar-nav mr-auto" sec:authorize="isAuthenticated()">
             <li class="nav-item active">
                 <a class="nav-link" href="#" th:href="@{'/parents/home'}">Home <span class="sr-only">(current)</span></a>
             </li>
@@ -26,6 +26,12 @@
                 <a class="nav-link" href="#">Add Child</a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="#" th:href="@{/parents/my-family}">View Family</a>
+            </li>
+
+        </ul>
+        <ul class="navbar-nav ml-auto" style="margin-right: 50px" sec:authorize="isAuthenticated()">
+            <li class="nav-item ml-auto">
                 <a class="nav-link " href="#"  th:href="@{/logout}">Logout</a>
             </li>
         </ul>
@@ -37,10 +43,12 @@
             <li class="nav-item">
                 <a class="nav-link" href="#" th:href="@{/register}">Sign up</a>
             </li>
+
+        </ul>
+        <ul class="navbar-nav ml-auto" style="margin-right: 50px" sec:authorize="isAnonymous()">
             <li class="nav-item">
                 <a class="nav-link" href="#" th:href="@{/login}">Login</a>
             </li>
-
         </ul>
     </div>
 </nav>
