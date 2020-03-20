@@ -15,7 +15,12 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mr-auto" sec:authorize="isAuthenticated()">
+
+        <!------------------------->
+        <!---- PARENT NAVBAR ------>
+        <!------------------------->
+
+        <ul class="navbar-nav mr-auto" sec:authorize="hasRole('ROLE_PARENT')">
             <li class="nav-item active">
                 <a class="nav-link" href="#" th:href="@{'/parents/home'}">Home <span class="sr-only">(current)</span></a>
             </li>
@@ -23,18 +28,50 @@
                 <a class="nav-link" href="#" th:href="@{/parents/new}">Add Parent</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">Add Child</a>
+                <a class="nav-link" href="#" th:href="@{/parents/add-child}">Add Child</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#" th:href="@{/parents/my-family}">View Family</a>
             </li>
-
         </ul>
+
+        <!------------------------>
+        <!---- CHILD NAVBAR ------>
+        <!------------------------>
+
+        <ul class="navbar-nav mr-auto" sec:authorize="hasRole('ROLE_CHILD')">
+            <li class="nav-item active">
+                <a class="nav-link" href="#" th:href="@{'/parents/home'}">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" th:href="@{/parents/new}">Add Parent</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" th:href="@{/parents/add-child}">Add Child</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" th:href="@{/parents/my-family}">View Family</a>
+            </li>
+        </ul>
+
+        <!--------------------------->
+        <!---- LOGOUT NAV LINK ------>
+        <!--------------------------->
+
         <ul class="navbar-nav ml-auto" style="margin-right: 50px" sec:authorize="isAuthenticated()">
+            <li class="nav-item">
+                <p class="nav-link" th:text="${#authentication.getPrincipal().getUsername()}">Family Name</p>
+            </li>
             <li class="nav-item ml-auto">
                 <a class="nav-link " href="#"  th:href="@{/logout}">Logout</a>
             </li>
         </ul>
+
+
+<!---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+        <!-------------------------------->
+        <!---- NOT LOGGED IN NAVBAR ------>
+        <!-------------------------------->
 
         <ul class="navbar-nav" sec:authorize="isAnonymous()">
             <li class="nav-item active">
@@ -43,7 +80,6 @@
             <li class="nav-item">
                 <a class="nav-link" href="#" th:href="@{/register}">Sign up</a>
             </li>
-
         </ul>
         <ul class="navbar-nav ml-auto" style="margin-right: 50px" sec:authorize="isAnonymous()">
             <li class="nav-item">
@@ -52,6 +88,8 @@
         </ul>
     </div>
 </nav>
+
+
 
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->

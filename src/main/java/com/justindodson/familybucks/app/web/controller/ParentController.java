@@ -1,10 +1,11 @@
 package com.justindodson.familybucks.app.web.controller;
 
 import com.justindodson.familybucks.app.auth.User;
+import com.justindodson.familybucks.app.model.entity.user.Child;
 import com.justindodson.familybucks.app.model.entity.user.Parent;
+import com.justindodson.familybucks.app.service.user.ChildService;
 import com.justindodson.familybucks.app.service.user.FamilyService;
 import com.justindodson.familybucks.app.service.user.ParentService;
-import com.justindodson.familybucks.app.service.user.ParentServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +26,18 @@ public class ParentController {
 
     private final Logger LOGGER = LoggerFactory.getLogger(ParentController.class);
 
+    private final ParentService parentService;
+    private final ChildService childService;
+    private final FamilyService familyService;
 
     @Autowired
-    private ParentService parentService;
-    @Autowired
-    private FamilyService familyService;
+    public ParentController(ParentService parentService, ChildService childService, FamilyService familyService) {
+        this.parentService = parentService;
+        this.childService = childService;
+        this.familyService = familyService;
+    }
 
+    // TODO: 3/20/20 !!!TESTING ONLY!!!: REMOVE THIS MAPPING TO SEE ALL PARENTS IN THE SYSTEM
     @GetMapping("/all")
     public String getAllParents(Model model) {
         List<Parent> parents = parentService.getAllParents();
@@ -54,7 +61,7 @@ public class ParentController {
         person.setFamily(currentUser.getFamily());
         parentService.createOrUpdateParent(person);
 
-        return "redirect:/parents/all";
+        return "redirect:/parents/my-family";
     }
 
     @GetMapping("/home")
@@ -74,5 +81,20 @@ public class ParentController {
         model.addAttribute("family_name", user.getFamily().getFamilyName());
 
         return "users/my_family";
+    }
+
+    @GetMapping("/add-child")
+    public String addChildView(Model model) {
+        Child child = new Child();
+        model.addAttribute("child", child);
+        return "users/add_child";
+    }
+
+    @PostMapping("/add-child")
+    public String addChildProcessor(Model model, @ModelAttribute("child") Child child, Principal principal) {
+        User currentUser = parentService.getParentByUsername(principal.getName());
+        child = childService.addChildToFamily(child, currentUser.getFamily());
+        childService.createOrUpdateChild(child);
+        return "redirect:/parents/my-family";
     }
 }

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/base :: head">
+</head>
+<body>
+
+<div th:replace="fragments/base :: navbar"></div>
+    <div class="container">
+        <form th:action="@{/parents/add-child}"  th:object="${child}" method="post">
+            <div class="form-group">
+                <label for="first_name">First Name</label>
+                <input class="form-control" id="first_name" type="text" placeholder="First Name" th:field="*{firstName}">
+            </div>
+            <div class="form-group">
+                <label for="last_name">Last Name</label>
+                <input class="form-control" id="last_name" type="text" placeholder="Last Name" th:field="*{lastName}">
+            </div>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input class="form-control" id="username" type="text" placeholder="Username" th:field="*{username}">
+            </div>
+            <div class="form-group">
+                <label for="password1">Password</label>
+                <input class="form-control" id="password1" type="password" placeholder="Password" th:field="*{password1}">
+            </div>
+            <div class="form-group">
+                <label for="password2">Password Confrimation</label>
+                <input class="form-control" id="password2" type="password" placeholder="Re-type Password" th:field="*{password2}">
+            </div>
+            <div class="form-group">
+                <input class="btn btn-primary btn-xl" type="submit" value="Add Child">
+            </div>
+        </form>
+    </div>
+
+    <div th:replace="fragments/base :: bootstrap-javascript-resources"></div>
+</body>
+</html>
