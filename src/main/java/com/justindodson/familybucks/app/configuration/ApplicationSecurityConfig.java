@@ -44,7 +44,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().disable().and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/", "/h2-console", "/register", "/css/*", "/js/*").permitAll()
+                .antMatchers("/", "/h2-console", "/register", "/css/**", "/js/**", "/assets/**").permitAll()
                 .anyRequest().authenticated()
                 .and().formLogin().defaultSuccessUrl("/parents/home", true)
                 .loginPage("/login").permitAll()

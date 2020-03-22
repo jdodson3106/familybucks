@@ -1,12 +1,45 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head th:fragment="head">
-    <!-- Required meta tags -->
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <!-- ===============================================-->
+    <!--    Document Title-->
+    <!-- ===============================================-->
+    <title>Family Bucks</title>
+
+
+    <!-- ===============================================-->
+    <!--    Favicons-->
+    <!-- ===============================================-->
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/img/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/img/favicons/favicon-16x16.png">
+    <link rel="shortcut icon" type="image/x-icon" href="../assets/img/favicons/favicon.ico">
+    <link rel="manifest" href="../assets/img/favicons/manifest.json">
+    <meta name="msapplication-TileImage" content="../assets/img/favicons/mstile-150x150.png">
+    <meta name="theme-color" content="#ffffff">
+
+
+    <!-- ===============================================-->
+    <!--    Stylesheets-->
+    <!-- ===============================================-->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500,600,700%7cPoppins:100,200,300,400,500,600,700,800,900" rel="stylesheet">
+    <link href="../assets/lib/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet">
+    <style>
+        body {
+             display: none;
+         }
+    </style>
+    <link href="../assets/lib/owl.carousel/owl.carousel.css" th:href="@{assets/lib/owl.carousel/owl.carousel.css}" rel="stylesheet">
+    <link class="style" href="../assets/css/theme.css" th:href="@{/css/theme.css}" rel="stylesheet" id="theme-style">
+    <link class="style" href="../assets/css/theme-dark.css" th:href="@{/css/theme-dark.css}" rel="stylesheet" id="theme-style-dark">
+    <link class="style" href="../assets/css/theme-rtl.css" th:href="@{/css/theme-rtl.css}" rel="stylesheet" id="theme-style-rtl">
+    <link class="style" href="../assets/css/theme-dark-rtl.css" th:href="@{/css/theme-dark-rtl.css}" rel="stylesheet" id="theme-style-dark-rtl">
+
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: transparent !important;" th:fragment="navbar">
@@ -93,11 +126,21 @@
 
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-<div th:fragment="bootstrap-javascript-resources">
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-    <script type="text/javascript" th:src="@{/static/js/password_check.js}"></script>
+<div th:fragment="javascripts">
+
+    <script th:src="@{/js/jquery.min.js}" src="../assets/js/jquery.min.js"></script>
+    <script th:src="@{/js/popper.min.js}" src="../assets/js/popper.min.js"></script>
+    <script th:src="@{/js/bootstrap.min.js}" src="../assets/js/bootstrap.min.js"></script>
+    <script src="../assets/lib/stickyfilljs/stickyfill.min.js"></script>
+    <script src="../assets/lib/sticky-kit/sticky-kit.min.js"></script>
+    <script src="../assets/lib/is_js/is.min.js"></script>
+    <script src="../assets/lib/lodash/lodash.min.js"></script>
+    <script src="../assets/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script th:src="@{/assets/lib/owl.carousel/owl.carousel.js}" src="../assets/lib/owl.carousel/owl.carousel.js"></script>
+    <script th:src="@{/assets/lib/typed.js/typed.js}" src="../assets/lib/typed.js/typed.js"></script>
+    <script th:src="@{/js/theme.js}" src="../assets/js/theme.js"></script>
+    <script src="../assets/lib/@fortawesome/all.min.js"></script>
+    <script type="text/javascript" th:src="@{/js/password_check.js}"></script>
 </div>
 </body>
 </html>
