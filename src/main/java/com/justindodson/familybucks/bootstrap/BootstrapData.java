@@ -1,11 +1,11 @@
 package com.justindodson.familybucks.bootstrap;
 
-import com.justindodson.familybucks.app.auth.UserRepository;
-import com.justindodson.familybucks.app.model.entity.user.Child;
-import com.justindodson.familybucks.app.model.entity.user.Family;
-import com.justindodson.familybucks.app.model.entity.user.Parent;
-import com.justindodson.familybucks.app.model.repository.user.FamilyRepository;
-import com.justindodson.familybucks.app.service.user.ParentServiceImpl;
+import com.justindodson.familybucks.accounts.auth.UserRepository;
+import com.justindodson.familybucks.accounts.model.entity.user.Child;
+import com.justindodson.familybucks.accounts.model.entity.user.Family;
+import com.justindodson.familybucks.accounts.model.entity.user.Parent;
+import com.justindodson.familybucks.accounts.model.repository.user.FamilyRepository;
+import com.justindodson.familybucks.accounts.service.ParentServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
