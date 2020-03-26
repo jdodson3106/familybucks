@@ -6,23 +6,32 @@ import com.justindodson.familybucks.accounts.model.entity.user.Parent;
 import com.justindodson.familybucks.accounts.service.ChildService;
 import com.justindodson.familybucks.accounts.service.FamilyService;
 import com.justindodson.familybucks.accounts.service.ParentService;
+import com.justindodson.familybucks.products.model.entity.Product;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
 import java.security.Principal;
+import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/parents")
 @Slf4j
 public class ParentController {
+    public static final String SERVICEURL = "http://localhost:8080";
 
     private final Logger LOGGER = LoggerFactory.getLogger(ParentController.class);
 
@@ -88,5 +97,37 @@ public class ParentController {
         child = childService.addChildToFamily(child, currentUser.getFamily());
         childService.createOrUpdateChild(child);
         return "redirect:/parents/my-family";
+    }
+
+    @GetMapping("/new-product")
+    public String addProductView(Model model) {
+        LOGGER.info("In the addProductView() method" );
+        Product product = new Product();
+        model.addAttribute("product", product);
+        return "users/add_product";
+    }
+
+    @PostMapping("/new-product")
+    public String addProductProcessor(@ModelAttribute("product") Product product, Principal principal) {
+        User currentUser = parentService.getParentByUsername(principal.getName());
+        product.setOwnerID(currentUser.getId());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Product> entity = new HttpEntity<>(product, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:8080/api/products/new";
+
+        try {
+            Product product1 = restTemplate.postForObject(new URI(url), entity, Product.class);
+//            LOGGER.info("Created product: " + product1.getName());
+            return "redirect:/dashboard";
+        }
+        catch(Exception e) {
+            LOGGER.error("Error creating product: " + product);
+            e.printStackTrace();
+            return "users/add_product";
+        }
     }
 }

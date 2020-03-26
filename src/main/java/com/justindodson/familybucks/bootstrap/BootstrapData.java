@@ -6,6 +6,8 @@ import com.justindodson.familybucks.accounts.model.entity.user.Family;
 import com.justindodson.familybucks.accounts.model.entity.user.Parent;
 import com.justindodson.familybucks.accounts.model.repository.user.FamilyRepository;
 import com.justindodson.familybucks.accounts.service.ParentServiceImpl;
+import com.justindodson.familybucks.products.model.entity.Product;
+import com.justindodson.familybucks.products.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -15,12 +17,14 @@ public class BootstrapData implements CommandLineRunner {
     private final UserRepository userRepository;
     private final FamilyRepository familyRepository;
     private final ParentServiceImpl parentServiceImpl;
+    private final ProductService productService;
 
     @Autowired
-    public BootstrapData(UserRepository userRepository, FamilyRepository familyRepository, ParentServiceImpl parentServiceImpl) {
+    public BootstrapData(UserRepository userRepository, FamilyRepository familyRepository, ParentServiceImpl parentServiceImpl, ProductService productService) {
         this.userRepository = userRepository;
         this.familyRepository = familyRepository;
         this.parentServiceImpl = parentServiceImpl;
+        this.productService = productService;
     }
 
     @Override
@@ -72,6 +76,13 @@ public class BootstrapData implements CommandLineRunner {
         userRepository.save(child6);
         userRepository.save(child7);
         userRepository.save(child8);
+
+        Product product = new Product();
+        product.setName("Random");
+        product.setDescription("asd;lkasdlkfjal;dskfja;dlkfjal;dksfj");
+        product.setCost(24.55);
+        product.setOwnerID(1);
+        productService.createOrUpdateProduct(product);
 
     }
 }

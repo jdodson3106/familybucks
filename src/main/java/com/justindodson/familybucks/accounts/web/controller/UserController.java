@@ -11,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.security.Principal;
+
 @Controller
 public class UserController {
 
@@ -22,9 +24,8 @@ public class UserController {
     }
 
     @GetMapping("/dashboard")
-    public String userDashboardView(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = userService.getUserByUsername(auth.getName());
+    public String userDashboardView(Model model, Principal principal) {
+        User user = userService.getUserByUsername(principal.getName());
         if (null != user) {
             if(user.getUserType().equalsIgnoreCase("parent")){
                 Parent parent = userService.getParentByUserType(user.getUserType(), user.getId());

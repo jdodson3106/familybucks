@@ -17,7 +17,7 @@ public class Product {
     @Column(nullable = false)
     private double cost;
     @Column(nullable = false)
-    private User owner;
+    private long ownerID;
 
     public long getId() {
         return id;
@@ -51,12 +51,12 @@ public class Product {
         this.cost = cost;
     }
 
-    public User getOwner() {
-        return owner;
+    public long getOwnerID() {
+        return ownerID;
     }
 
-    public void setOwner(User owner) {
-        this.owner = owner;
+    public void setOwnerID(long ownerID) {
+        this.ownerID = ownerID;
     }
 
     @Override

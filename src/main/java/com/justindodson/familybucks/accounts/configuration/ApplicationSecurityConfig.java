@@ -17,6 +17,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @EnableWebSecurity
 public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
+
     @Autowired
     private FamilyBucksUserDetailsService userDetailsService;
 
@@ -44,11 +45,12 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().disable().and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/", "/h2-console", "/register", "/css/**", "/js/**", "/assets/**").permitAll()
+                .antMatchers("/", "/api/**", "/h2-console", "/register", "/css/**", "/js/**", "/assets/**").permitAll()
                 .anyRequest().authenticated()
                 .and().formLogin().defaultSuccessUrl("/dashboard", true)
                 .loginPage("/login").permitAll()
                 .and().logout().invalidateHttpSession(true).clearAuthentication(true)
+
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .logoutSuccessUrl("/logout-success").permitAll();
     }

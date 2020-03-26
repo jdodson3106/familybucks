@@ -26,7 +26,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void createOrUpdateProduct(Product product) {
+    public Product createOrUpdateProduct(Product product) {
         Optional<Product> foundProduct = productRepository.findById(product.getId());
 
         if(foundProduct.isPresent()) {
@@ -35,11 +35,11 @@ public class ProductServiceImpl implements ProductService {
             updated.setName(product.getName());
             updated.setDescription(product.getDescription());
             updated.setCost(product.getCost());
-            updated.setOwner(product.getOwner());
-            productRepository.save(updated);
+            updated.setOwnerID(product.getOwnerID());
+            return productRepository.save(updated);
         } else {
-            productRepository.save(product);
             LOGGER.info("Created new product: " + product.toString());
+            return productRepository.save(product);
         }
     }
 
@@ -57,7 +57,7 @@ public class ProductServiceImpl implements ProductService {
         List<Product> ownerProducts = new ArrayList<>();
 
         productRepository.findAll().forEach(product -> {
-            if(product.getOwner().getId() == ownerId) {
+            if(product.getOwnerID() == ownerId) {
                 ownerProducts.add(product);
             }
         });
