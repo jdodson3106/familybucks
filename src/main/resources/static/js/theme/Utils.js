@@ -1,6 +1,7 @@
 'use strict';
 
-import storage from './config';
+import storage from './config.dark-mode';
+
 
 /*-----------------------------------------------
 |   Utilities
@@ -125,7 +126,9 @@ const utils = (($) => {
       const windowHeight = this.$window.height();
       const elemTop = $el.offset().top;
       const elemHeight = $el.height();
+      
       const windowScrollTop = this.$window.scrollTop();
+
 
       return elemTop <= (windowScrollTop + windowHeight)
         && windowScrollTop <= (elemTop + elemHeight);
@@ -164,7 +167,10 @@ const utils = (($) => {
     rgbaColors(){
       return Object.keys(this.colors).map( color => this.rgbaColor(this.colors[color]));
     },
-    settings: pluginSettings(this)
+    settings: pluginSettings(this),
+    isIterableArray(array) {  
+      return Array.isArray(array) && !!array.length;
+    }
   };
   return Utils;
 

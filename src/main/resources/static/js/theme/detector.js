@@ -13,6 +13,7 @@ utils.$document.ready(() => {
   if (window.is.firefox()) utils.$html.addClass('firefox');
   if (window.is.safari()) utils.$html.addClass('safari');
   if (window.is.ios()) utils.$html.addClass('ios');
+  if (window.is.iphone()) utils.$html.addClass('iphone');
   if (window.is.ie()) utils.$html.addClass('ie');
   if (window.is.edge()) utils.$html.addClass('edge');
   if (window.is.chrome()) utils.$html.addClass('chrome');

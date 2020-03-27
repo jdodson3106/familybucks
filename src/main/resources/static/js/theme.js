@@ -10,33 +10,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-var config = {
-  isRTL: false,
-  isFluid: false,
-  isDark: false
-};
-
-var isChecked = function isChecked(key) {
-  return JSON.parse(localStorage.getItem(key));
-};
-
-var isNull = function isNull(key) {
-  return JSON.parse(localStorage.getItem(key)) === null;
-};
-
-isNull('isRTL') && localStorage.setItem('isRTL', config.isRTL);
-isNull('isFluid') && localStorage.setItem('isFluid', config.isFluid);
-isNull('isDark') && localStorage.setItem('isDark', config.isDark);
-var isDark = isChecked('isDark');
-var isRTL = isChecked('isRTL');
-var isFluid = isChecked('isFluid');
-$('#dark').prop('checked', isDark);
-$('#rtl').prop('checked', isRTL);
-$('#fluid').prop('checked', isFluid);
+/*-----------------------------------------------
+|   Theme Configuration
+-----------------------------------------------*/
 var storage = {
-  isDark: isDark,
-  isRTL: isRTL,
-  isFluid: isFluid
+  isDark: false
 };
 /*-----------------------------------------------
 |   Utilities
@@ -223,14 +201,35 @@ var utils = function ($) {
         return _this4.rgbaColor(_this4.colors[color]);
       });
     },
-    settings: pluginSettings(_this)
+    settings: pluginSettings(_this),
+    isIterableArray: function isIterableArray(array) {
+      return Array.isArray(array) && !!array.length;
+    }
   };
   return Utils;
 }(jQuery);
 /*-----------------------------------------------
-|   Emoji Picker
+|   Detector
 -----------------------------------------------*/
 
+
+utils.$document.ready(function () {
+  if (window.is.opera()) utils.$html.addClass('opera');
+  if (window.is.mobile()) utils.$html.addClass('mobile');
+  if (window.is.firefox()) utils.$html.addClass('firefox');
+  if (window.is.safari()) utils.$html.addClass('safari');
+  if (window.is.ios()) utils.$html.addClass('ios');
+  if (window.is.iphone()) utils.$html.addClass('iphone');
+  if (window.is.ie()) utils.$html.addClass('ie');
+  if (window.is.edge()) utils.$html.addClass('edge');
+  if (window.is.chrome()) utils.$html.addClass('chrome');
+  if (utils.nua.match(/puppeteer/i)) utils.$html.addClass('puppeteer');
+  if (window.is.mac()) utils.$html.addClass('osx');
+  if (window.is.windows()) utils.$html.addClass('windows');
+});
+/*-----------------------------------------------
+|   Emoji Picker
+-----------------------------------------------*/
 
 window.utils.$document.ready(function () {
   var Event = {
@@ -320,6 +319,118 @@ utils.$document.ready(function () {
   // https://getbootstrap.com/docs/4.0/getting-started/browsers-devices/#select-menu
   // https://github.com/twbs/bootstrap/issues/26183
   window.is.android() && $('select.form-control').removeClass('form-control').css('width', '100%');
+});
+/*-----------------------------------------------
+|   Bootstrap Wizard
+-----------------------------------------------*/
+
+utils.$document.ready(function () {
+  var Selector = {
+    DATA_WIZARD: '[data-wizard]',
+    PREVIOUS_BUTTON: '.previous .btn',
+    TAB_PANE: '.tab-pane',
+    FORM_VALIDATION: '.form-validation',
+    NAV_ITEM_CIRCLE: '.nav-item-circle',
+    NAV_ITEM: '.nav-item',
+    NAV_LINK: '.nav-link',
+    WIZARD_LOTTIE: '.wizard-lottie'
+  };
+  var ClassName = {
+    ACTIVE: 'active',
+    DONE: 'done',
+    NAV: 'nav'
+  };
+  var DATA_KEY = {
+    OPTIONS: 'options',
+    WIZARD_STATE: 'wizard-state',
+    CONTROLLER: 'controller',
+    ERROR_MODAL: 'error-modal'
+  };
+  var wizards = $(Selector.DATA_WIZARD);
+
+  var isFormValidate = function isFormValidate($currentTab) {
+    var $currentTabForms = $currentTab.find(Selector.FORM_VALIDATION);
+    var isValidate = false;
+    $currentTabForms.each(function (i, v) {
+      isValidate = $(v).valid();
+      return isValidate;
+    });
+    return isValidate;
+  };
+
+  !!wizards.length && wizards.each(function (index, value) {
+    var $this = $(value);
+    var controller = $this.data(DATA_KEY.CONTROLLER);
+    var $controller = $(controller);
+    var $buttonPrev = $controller.find(Selector.PREVIOUS_BUTTON);
+    var $modal = $($this.data(DATA_KEY.ERROR_MODAL));
+    var $lottie = $(value).find(Selector.WIZARD_LOTTIE);
+    var options = $.extend({
+      container: value.querySelector(Selector.WIZARD_LOTTIE),
+      renderer: 'svg',
+      loop: true,
+      autoplay: false,
+      name: 'Hello World'
+    }, $lottie.data(DATA_KEY.OPTIONS));
+    var animation = window.bodymovin.loadAnimation(options);
+    $this.bootstrapWizard({
+      tabClass: ClassName.NAV,
+      onNext: function onNext(tab, navigation, idx) {
+        var $currentTab = $this.find(Selector.TAB_PANE).eq(idx - 1);
+        return isFormValidate($currentTab);
+      },
+      onTabClick: function onTabClick(tab, navigation, idx, clickedIndex) {
+        var stepDone = $this.find(".nav-item:nth-child(" + (clickedIndex + 1) + ") .nav-link").data(DATA_KEY.WIZARD_STATE);
+
+        if (stepDone === 'done') {
+          $modal.modal('show');
+          return false;
+        }
+
+        if (clickedIndex <= idx) {
+          return true;
+        }
+
+        var isValid = true;
+        $this.find(Selector.TAB_PANE).each(function (tabIndex, tabValue) {
+          if (tabIndex < clickedIndex) {
+            $this.bootstrapWizard('show', tabIndex);
+            isValid = isFormValidate($(tabValue));
+          }
+
+          return isValid;
+        });
+        return isValid;
+      },
+      onTabShow: function onTabShow(tab, navigation, idx) {
+        var length = navigation.find('li').length - 1;
+        idx === 0 ? $buttonPrev.hide() : $buttonPrev.show();
+        idx === length && setTimeout(function () {
+          return animation.play();
+        }, 300);
+        $this.find(Selector.NAV_LINK).removeClass(ClassName.DONE);
+        $this.find(Selector.NAV_ITEM).each(function (i, v) {
+          var link = $(v).find(Selector.NAV_LINK);
+
+          if (idx === length && !link.hasClass(ClassName.ACTIVE)) {
+            link.attr('data-wizard-state', 'done');
+          }
+
+          if (!link.hasClass(ClassName.ACTIVE)) {
+            link.addClass(ClassName.DONE);
+            return true;
+          }
+
+          if (idx === length) {
+            link.addClass(ClassName.DONE);
+            $controller.hide();
+          }
+
+          return false;
+        });
+      }
+    });
+  });
 });
 /*-----------------------------------------------
 |   Bulk Actions
@@ -1211,85 +1322,53 @@ utils.$document.ready(function () {
 |   Demo mode
 -----------------------------------------------*/
 
-var setItem = function setItem(key, value) {
-  return localStorage.setItem(key, !value);
-};
-
 window.utils.$document.ready(function () {
   var _window2 = window,
       utils = _window2.utils,
       location = _window2.location;
-  var isDark = storage.isDark,
-      isRTL = storage.isRTL,
-      isFluid = storage.isFluid;
   var Event = {
     CHANGE: 'change'
   };
-  var ClassName = {
-    CONTAINER: 'container',
-    CONTAINER_FLUID: 'container-fluid'
-  };
   var Selector = {
-    DATALAYOUT: '[data-layout]',
-    BODY: 'body',
-    DARK: '#dark',
-    RTL: '#rtl',
-    FLUID: '#fluid',
-    THEMESTYLE: '#theme-style',
-    STYLE: '.style'
+    RTL: '#mode-rtl',
+    FLUID: '#mode-fluid',
+    INPUT_NAVBAR: "input[name='navbar']",
+    INPUT_COLOR_SCHEME: "input[name='colorScheme']"
   };
-  var Attribute = {
-    DIR: 'dir',
-    DISABLED: 'disabled'
-  };
+  var DATA_KEY = {
+    URL: 'url',
+    HOME_URL: 'home-url',
+    PAGE_URL: 'page-url'
+  }; // Redirect on Checkbox change
 
-  var handleChange = function handleChange(selector, key, value) {
-    utils.$document.on(Event.CHANGE, selector, function () {
-      setItem(key, value);
-      location.reload();
+  var handleChange = function handleChange(selector) {
+    utils.$document.on(Event.CHANGE, selector, function (e) {
+      var $this = $(e.currentTarget);
+      var isChecked = $this.prop('checked');
+
+      if (isChecked) {
+        var url = $this.data(DATA_KEY.URL);
+        location.replace(url);
+      } else {
+        var homeUrl = $this.data(DATA_KEY.HOME_URL);
+        location.replace(homeUrl);
+      }
     });
   };
 
-  var disabledAllStyles = function disabledAllStyles() {
-    $(Selector.STYLE).each(function disabledStyles() {
-      $(this).attr(Attribute.DISABLED, true);
+  var handleInputChange = function handleInputChange(selector) {
+    utils.$document.on(Event.CHANGE, selector, function (e) {
+      var $this = $(e.currentTarget);
+      var pageUrl = $this.data(DATA_KEY.PAGE_URL);
+      location.replace(pageUrl);
     });
-  };
-
-  var $dataLayout = $(Selector.DATALAYOUT); // Fluid mode controler
-
-  if (isFluid) {
-    $dataLayout.addClass(ClassName.CONTAINER_FLUID).removeClass(ClassName.CONTAINER);
-  } else {
-    $dataLayout.addClass(ClassName.CONTAINER).removeClass(ClassName.CONTAINER_FLUID);
-  } // Dark and RTL mode controler
+  }; // Mode checkbox handler
 
 
-  disabledAllStyles();
-  utils.$html.attr(Attribute.DIR, isRTL ? 'rtl' : 'ltr');
-  $("" + Selector.THEMESTYLE + (isDark ? '-dark' : '') + (isRTL ? '-rtl' : '')).removeAttr(Attribute.DISABLED);
-  $(Selector.BODY).css('display', 'block'); // Mode checkbox handler
-
-  handleChange(Selector.DARK, 'isDark', isDark);
-  handleChange(Selector.FLUID, 'isFluid', isFluid);
-  handleChange(Selector.RTL, 'isRTL', isRTL);
-});
-/*-----------------------------------------------
-|   Detector
------------------------------------------------*/
-
-utils.$document.ready(function () {
-  if (window.is.opera()) utils.$html.addClass('opera');
-  if (window.is.mobile()) utils.$html.addClass('mobile');
-  if (window.is.firefox()) utils.$html.addClass('firefox');
-  if (window.is.safari()) utils.$html.addClass('safari');
-  if (window.is.ios()) utils.$html.addClass('ios');
-  if (window.is.ie()) utils.$html.addClass('ie');
-  if (window.is.edge()) utils.$html.addClass('edge');
-  if (window.is.chrome()) utils.$html.addClass('chrome');
-  if (utils.nua.match(/puppeteer/i)) utils.$html.addClass('puppeteer');
-  if (window.is.mac()) utils.$html.addClass('osx');
-  if (window.is.windows()) utils.$html.addClass('windows');
+  handleChange(Selector.RTL);
+  handleChange(Selector.FLUID);
+  handleInputChange(Selector.INPUT_NAVBAR);
+  handleInputChange(Selector.INPUT_COLOR_SCHEME);
 });
 /*-----------------------------------------------
 |   Documentation and Component Navigation
@@ -1326,38 +1405,167 @@ utils.$document.ready(function () {
 -----------------------------------------------*/
 
 window.utils.$document.ready(function () {
-  var Event = {
-    SHOWN_BS_DROPDOWN: 'shown.bs.dropdown',
-    HIDDEN_BS_DROPDOWN: 'hidden.bs.dropdown'
-  };
-  var Selector = {
-    TABLE_RESPONSIVE: '.table-responsive',
-    DROPDOWN_MENU: '.dropdown-menu'
-  };
-  $(Selector.TABLE_RESPONSIVE).on(Event.SHOWN_BS_DROPDOWN, function dashboardTableDropdown(e) {
-    var t = $(this);
-    var m = $(e.target).find(Selector.DROPDOWN_MENU);
-    var tb = t.offset().top + t.height();
-    var mb = m.offset().top + m.outerHeight(true);
-    var d = 20; // Space for shadow + scrollbar.
+  // Only for ios
+  if (window.is.ios()) {
+    var Event = {
+      SHOWN_BS_DROPDOWN: 'shown.bs.dropdown',
+      HIDDEN_BS_DROPDOWN: 'hidden.bs.dropdown'
+    };
+    var Selector = {
+      TABLE_RESPONSIVE: '.table-responsive',
+      DROPDOWN_MENU: '.dropdown-menu'
+    };
+    $(Selector.TABLE_RESPONSIVE).on(Event.SHOWN_BS_DROPDOWN, function dashboardTableDropdown(e) {
+      var t = $(this);
+      var m = $(e.target).find(Selector.DROPDOWN_MENU);
+      var tb = t.offset().top + t.height();
+      var mb = m.offset().top + m.outerHeight(true);
+      var d = 20; // Space for shadow + scrollbar.
 
-    if (t[0].scrollWidth > t.innerWidth()) {
-      if (mb + d > tb) {
-        t.css('padding-bottom', mb + d - tb);
+      if (t[0].scrollWidth > t.innerWidth()) {
+        if (mb + d > tb) {
+          t.css('padding-bottom', mb + d - tb);
+        }
+      } else {
+        t.css('overflow', 'visible');
       }
-    } else {
-      t.css('overflow', 'visible');
-    }
-  }).on(Event.HIDDEN_BS_DROPDOWN, function (e) {
-    var $this = $(e.currentTarget);
-    $this.css({
-      'padding-bottom': '',
-      overflow: ''
+    }).on(Event.HIDDEN_BS_DROPDOWN, function (e) {
+      var $this = $(e.currentTarget);
+      $this.css({
+        'padding-bottom': '',
+        overflow: ''
+      });
     });
-  });
+  }
 }); // Reference
 // https://github.com/twbs/bootstrap/issues/11037#issuecomment-274870381
 
+/*-----------------------------------------------
+|   Documentation and Component Navigation
+-----------------------------------------------*/
+
+utils.$document.ready(function () {
+  var Selector = {
+    NAVBAR_THEME_DROPDOWN: '.navbar-theme .dropdown',
+    DROPDOWN_ON_HOVER: '.dropdown-on-hover',
+    DROPDOWN_MENU: '.dropdown-menu',
+    DATA_TOGGLE_DROPDOWN: '[data-toggle="dropdown"]',
+    BODY: 'body',
+    DROPDOWN_MENU_ANCHOR: '.dropdown-menu a'
+  };
+  var ClassName = {
+    DROPDOWN_ON_HOVER: 'dropdown-on-hover',
+    SHOW: 'show'
+  };
+  var Event = {
+    CLICK: 'click',
+    MOUSE_LEAVE: 'mouseleave',
+    MOUSE_EVENT: 'mouseenter mouseleave'
+  };
+  var Attribute = {
+    ARIA_EXPANDED: 'aria-expanded'
+  };
+  var $navbarDropdown = $(Selector.NAVBAR_THEME_DROPDOWN);
+
+  if (!window.is.mobile()) {
+    $navbarDropdown.addClass(ClassName.DROPDOWN_ON_HOVER);
+  } else {
+    $navbarDropdown.removeClass(ClassName.DROPDOWN_ON_HOVER);
+  }
+
+  var toggleDropdown = function toggleDropdown(e) {
+    var $el = $(e.target);
+    var dropdown = $el.closest(Selector.DROPDOWN_ON_HOVER);
+    var dropdownMenu = $(Selector.DROPDOWN_MENU, dropdown);
+    setTimeout(function () {
+      var shouldOpen = e.type !== Event.CLICK && dropdown.is(':hover');
+      dropdownMenu.toggleClass(ClassName.SHOW, shouldOpen);
+      dropdown.toggleClass(ClassName.SHOW, shouldOpen);
+      $(Selector.DATA_TOGGLE_DROPDOWN, dropdown).attr(Attribute.ARIA_EXPANDED, shouldOpen);
+    }, e.type === Event.MOUSE_LEAVE ? 100 : 0);
+  };
+
+  $(Selector.BODY).on(Event.MOUSE_EVENT, Selector.DROPDOWN_ON_HOVER, toggleDropdown).on(Event.CLICK, Selector.DROPDOWN_MENU_ANCHOR, toggleDropdown);
+});
+/*-----------------------------------------------
+|   Dropzone
+-----------------------------------------------*/
+
+window.Dropzone ? window.Dropzone.autoDiscover = false : '';
+window.utils.$document.ready(function () {
+  var Selector = {
+    DROPZONE: '[data-dropzone]',
+    DZ_ERROR_MESSAGE: '.dz-error-message',
+    DZ_PREVIEW: '.dz-preview',
+    DZ_PROGRESS: '.dz-preview .dz-preview-cover .dz-progress',
+    DZ_PREVIEW_COVER: '.dz-preview .dz-preview-cover'
+  };
+  var ClassName = {
+    DZ_FILE_PROCESSING: 'dz-file-processing',
+    DZ_FILE_COMPLETE: 'dz-file-complete',
+    DZ_COMPLETE: 'dz-complete',
+    DZ_PROCESSING: 'dz-processing'
+  };
+  var DATA_KEY = {
+    OPTIONS: 'options'
+  };
+  var Events = {
+    ADDED_FILE: 'addedfile',
+    COMPLETE: 'complete'
+  };
+  var dropzones = $(Selector.DROPZONE);
+  !!dropzones.length && dropzones.each(function (index, value) {
+    var element = value;
+    var $this = $(element);
+    var userOptions = $this.data(DATA_KEY.OPTIONS);
+    userOptions = userOptions || {};
+    var data = userOptions.data ? userOptions.data : {};
+    var options = $.extend({
+      url: '/assets/php/',
+      addRemoveLinks: false,
+      previewsContainer: element.querySelector(Selector.DZ_PREVIEW),
+      previewTemplate: element.querySelector(Selector.DZ_PREVIEW).innerHTML,
+      thumbnailWidth: null,
+      thumbnailHeight: null,
+      init: function init() {
+        var thisDropzone = this;
+
+        if (data.length) {
+          $.each(data, function (i, v) {
+            var mockFile = {
+              name: v.name,
+              size: v.size
+            };
+            thisDropzone.options.addedfile.call(thisDropzone, mockFile);
+            thisDropzone.options.thumbnail.call(thisDropzone, mockFile, v.url + "/" + v.name);
+          });
+        }
+
+        thisDropzone.on(Events.ADDED_FILE, function addedfile() {
+          if ('maxFiles' in userOptions) {
+            if (userOptions.maxFiles === 1 && $this.find(Selector.DZ_PREVIEW_COVER).length > 1) {
+              $this.find(Selector.DZ_PREVIEW_COVER).first().remove();
+            }
+
+            if (userOptions.maxFiles === 1 && this.files.length > 1) {
+              this.removeFile(this.files[0]);
+            }
+          }
+        });
+      }
+    }, userOptions);
+    element.querySelector(Selector.DZ_PREVIEW).innerHTML = '';
+    var dropzone = new window.Dropzone(value, options);
+    dropzone.on(Events.ADDED_FILE, function () {
+      $this.find(Selector.DZ_PREVIEW_COVER).removeClass(ClassName.DZ_FILE_COMPLETE);
+      $this.addClass(ClassName.DZ_FILE_PROCESSING);
+    });
+    dropzone.on(Events.COMPLETE, function () {
+      $this.find(Selector.DZ_PREVIEW_COVER).removeClass(ClassName.DZ_PROCESSING);
+      $this.addClass(ClassName.DZ_FILE_COMPLETE);
+    });
+  });
+});
 /*-----------------------------------------------
 |  Echarts
 -----------------------------------------------*/
@@ -2659,19 +2867,12 @@ utils.$document.ready(function ($) {
 -----------------------------------------------*/
 
 window.utils.$document.ready(function () {
-  var select2 = $('.selectpicker');
-  select2.length && select2.each(function (index, value) {
-    var $this = $(value);
-    var options = $.extend({}, $this.data('options'));
-    $this.select2(options);
-  });
-});
-window.utils.$document.ready(function () {
   var datetimepicker = $('.datetimepicker');
   datetimepicker.length && datetimepicker.each(function (index, value) {
     var $this = $(value);
     var options = $.extend({
-      dateFormat: 'd/m/y'
+      dateFormat: 'd/m/y',
+      disableMobile: true
     }, $this.data('options'));
     $this.attr('placeholder', options.dateFormat);
     $this.flatpickr(options);
@@ -2709,6 +2910,7 @@ window.utils.$document.ready(function () {
 
 function initMap() {
   var $googlemaps = $('.googlemap');
+  var isDark = storage.isDark;
 
   if ($googlemaps.length) {
     // Visit https://snazzymaps.com/ for more themes
@@ -3611,7 +3813,7 @@ function initMap() {
       var markerPopup = $googlemap.html();
       var icon = $googlemap.data('icon') ? $googlemap.data('icon') : 'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi.png';
       var zoom = $googlemap.data('zoom');
-      var mapStyle = $googlemap.data('theme');
+      var mapStyle = isDark ? 'Midnight' : $googlemap.data('theme');
       var mapElement = value;
 
       if ($googlemap.data('theme') === 'streetview') {
@@ -3652,18 +3854,32 @@ function initMap() {
   }
 }
 /*-----------------------------------------------
-|   Tabs
+|   Incrment/Decrement Input Fields
 -----------------------------------------------*/
 
 
 utils.$document.ready(function () {
-  $(document).on('click', '[data-field]', function (e) {
+  var Selector = {
+    DATA_FIELD: '[data-field]',
+    INPUT_GROUP: '.input-group'
+  };
+  var DATA_KEY = {
+    FIELD: 'field',
+    TYPE: 'type'
+  };
+  var Events = {
+    CLICK: 'click'
+  };
+  var Attributes = {
+    MIN: 'min'
+  };
+  utils.$document.on(Events.CLICK, Selector.DATA_FIELD, function (e) {
     var $this = $(e.target);
-    var inputField = $this.data('field');
-    var $inputField = $this.parents('.input-group').children("." + inputField);
-    var $btnType = $this.data('type');
+    var inputField = $this.data(DATA_KEY.FIELD);
+    var $inputField = $this.parents(Selector.INPUT_GROUP).children("." + inputField);
+    var $btnType = $this.data(DATA_KEY.TYPE);
     var value = parseInt($inputField.val(), 10);
-    var min = $inputField.data('min');
+    var min = $inputField.attr(Attributes.MIN);
 
     if (min) {
       min = parseInt(min, 10);
@@ -3679,6 +3895,1059 @@ utils.$document.ready(function () {
 
     $inputField.val(value);
   });
+});
+/*-----------------------------------------------
+|   Jquery Validation
+-----------------------------------------------*/
+
+window.utils.$document.ready(function () {
+  var forms = $('.form-validation');
+  forms.length && forms.each(function (index, value) {
+    var $this = $(value);
+    var options = $.extend({}, $this.data('options'));
+    $this.validate(options);
+  });
+});
+/*-----------------------------------------------
+|   Leaflet
+-----------------------------------------------*/
+
+window.utils.$document.ready(function () {
+  var points = [{
+    lat: 53.958332,
+    long: -1.080278,
+    name: 'Diana Meyer',
+    street: 'Slude Strand 27',
+    location: '1130 Kobenhavn'
+  }, {
+    lat: 52.958332,
+    long: -1.080278,
+    name: 'Diana Meyer',
+    street: 'Slude Strand 27',
+    location: '1130 Kobenhavn'
+  }, {
+    lat: 51.958332,
+    long: -1.080278,
+    name: 'Diana Meyer',
+    street: 'Slude Strand 27',
+    location: '1130 Kobenhavn'
+  }, {
+    lat: 53.958332,
+    long: -1.080278,
+    name: 'Diana Meyer',
+    street: 'Slude Strand 27',
+    location: '1130 Kobenhavn'
+  }, {
+    lat: 54.958332,
+    long: -1.080278,
+    name: 'Diana Meyer',
+    street: 'Slude Strand 27',
+    location: '1130 Kobenhavn'
+  }, {
+    lat: 55.958332,
+    long: -1.080278,
+    name: 'Diana Meyer',
+    street: 'Slude Strand 27',
+    location: '1130 Kobenhavn'
+  }, {
+    lat: 53.908332,
+    long: -1.080278,
+    name: 'Diana Meyer',
+    street: 'Slude Strand 27',
+    location: '1130 Kobenhavn'
+  }, {
+    lat: 53.008332,
+    long: -1.080278,
+    name: 'Diana Meyer',
+    street: 'Slude Strand 27',
+    location: '1130 Kobenhavn'
+  }, {
+    lat: 53.158332,
+    long: -1.080278,
+    name: 'Diana Meyer',
+    street: 'Slude Strand 27',
+    location: '1130 Kobenhavn'
+  }, {
+    lat: 53.000032,
+    long: -1.080278,
+    name: 'Diana Meyer',
+    street: 'Slude Strand 27',
+    location: '1130 Kobenhavn'
+  }, {
+    lat: 52.292001,
+    long: -2.220000,
+    name: 'Anke Schroder',
+    street: 'Industrivej 54',
+    location: '4140 Borup'
+  }, {
+    lat: 52.392001,
+    long: -2.220000,
+    name: 'Anke Schroder',
+    street: 'Industrivej 54',
+    location: '4140 Borup'
+  }, {
+    lat: 51.492001,
+    long: -2.220000,
+    name: 'Anke Schroder',
+    street: 'Industrivej 54',
+    location: '4140 Borup'
+  }, {
+    lat: 51.192001,
+    long: -2.220000,
+    name: 'Anke Schroder',
+    street: 'Industrivej 54',
+    location: '4140 Borup'
+  }, {
+    lat: 52.292001,
+    long: -2.220000,
+    name: 'Anke Schroder',
+    street: 'Industrivej 54',
+    location: '4140 Borup'
+  }, {
+    lat: 54.392001,
+    long: -2.220000,
+    name: 'Anke Schroder',
+    street: 'Industrivej 54',
+    location: '4140 Borup'
+  }, {
+    lat: 51.292001,
+    long: -2.220000,
+    name: 'Anke Schroder',
+    street: 'Industrivej 54',
+    location: '4140 Borup'
+  }, {
+    lat: 52.102001,
+    long: -2.220000,
+    name: 'Anke Schroder',
+    street: 'Industrivej 54',
+    location: '4140 Borup'
+  }, {
+    lat: 52.202001,
+    long: -2.220000,
+    name: 'Anke Schroder',
+    street: 'Industrivej 54',
+    location: '4140 Borup'
+  }, {
+    lat: 51.063202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 51.363202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 51.463202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 51.563202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 51.763202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 51.863202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 51.963202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 51.000202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 51.000202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 51.163202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 52.263202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 53.463202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 55.163202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 56.263202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 56.463202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 56.563202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 56.663202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 56.763202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 56.863202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 56.963202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 57.973202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 57.163202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 51.163202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 51.263202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 51.363202,
+    long: -1.308000,
+    name: 'Tobias Vogel',
+    street: 'Mollebakken 33',
+    location: '3650 Olstykke'
+  }, {
+    lat: 51.409000,
+    long: -2.647000,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.680000,
+    long: -1.490000,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 50.259998,
+    long: -5.051000,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 54.906101,
+    long: -1.381130,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.383331,
+    long: -1.466667,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.483002,
+    long: -2.293100,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 51.509865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 51.109865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 51.209865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 51.309865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 51.409865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 51.609865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 51.709865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 51.809865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 51.909865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 52.109865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 52.209865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 52.309865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 52.409865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 52.509865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 52.609865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 52.709865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 52.809865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 52.909865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 52.519865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 52.529865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 52.539865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.549865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 52.549865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.109865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.209865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.319865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.329865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.409865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.559865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.619865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.629865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.639865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.649865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.669865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.669865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.719865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.739865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.749865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.759865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.769865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.769865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.819865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.829865,
+    long: -0.118092,
+    name: 'Richard Hendricks',
+    street: '37 Seafield Place',
+    location: 'London'
+  }, {
+    lat: 53.483959,
+    long: -2.244644,
+    name: 'Ethel B. Brooks',
+    street: '2576 Sun Valley Road'
+  }, {
+    lat: 40.737,
+    long: -73.923,
+    name: 'Marshall D. Lewis',
+    street: '1489 Michigan Avenue',
+    location: 'Michigan'
+  }, {
+    lat: 39.737,
+    long: -73.923,
+    name: 'Marshall D. Lewis',
+    street: '1489 Michigan Avenue',
+    location: 'Michigan'
+  }, {
+    lat: 38.737,
+    long: -73.923,
+    name: 'Marshall D. Lewis',
+    street: '1489 Michigan Avenue',
+    location: 'Michigan'
+  }, {
+    lat: 37.737,
+    long: -73.923,
+    name: 'Marshall D. Lewis',
+    street: '1489 Michigan Avenue',
+    location: 'Michigan'
+  }, {
+    lat: 40.737,
+    long: -73.923,
+    name: 'Marshall D. Lewis',
+    street: '1489 Michigan Avenue',
+    location: 'Michigan'
+  }, {
+    lat: 41.737,
+    long: -73.923,
+    name: 'Marshall D. Lewis',
+    street: '1489 Michigan Avenue',
+    location: 'Michigan'
+  }, {
+    lat: 42.737,
+    long: -73.923,
+    name: 'Marshall D. Lewis',
+    street: '1489 Michigan Avenue',
+    location: 'Michigan'
+  }, {
+    lat: 43.737,
+    long: -73.923,
+    name: 'Marshall D. Lewis',
+    street: '1489 Michigan Avenue',
+    location: 'Michigan'
+  }, {
+    lat: 44.737,
+    long: -73.923,
+    name: 'Marshall D. Lewis',
+    street: '1489 Michigan Avenue',
+    location: 'Michigan'
+  }, {
+    lat: 45.737,
+    long: -73.923,
+    name: 'Marshall D. Lewis',
+    street: '1489 Michigan Avenue',
+    location: 'Michigan'
+  }, {
+    lat: 46.7128,
+    long: 74.0060,
+    name: 'Elizabeth C. Lyons',
+    street: '4553 Kenwood Place',
+    location: 'Fort Lauderdale'
+  }, {
+    lat: 40.7128,
+    long: 74.1181,
+    name: 'Elizabeth C. Lyons',
+    street: '4553 Kenwood Place',
+    location: 'Fort Lauderdale'
+  }, {
+    lat: 14.2350,
+    long: 51.9253,
+    name: 'Ralph D. Wylie',
+    street: '3186 Levy Court',
+    location: 'North Reading'
+  }, {
+    lat: 15.2350,
+    long: 51.9253,
+    name: 'Ralph D. Wylie',
+    street: '3186 Levy Court',
+    location: 'North Reading'
+  }, {
+    lat: 16.2350,
+    long: 51.9253,
+    name: 'Ralph D. Wylie',
+    street: '3186 Levy Court',
+    location: 'North Reading'
+  }, {
+    lat: 14.2350,
+    long: 51.9253,
+    name: 'Ralph D. Wylie',
+    street: '3186 Levy Court',
+    location: 'North Reading'
+  }, {
+    lat: 15.8267,
+    long: 47.9218,
+    name: 'Hope A. Atkins',
+    street: '3715 Hillcrest Drive',
+    location: 'Seattle'
+  }, {
+    lat: 15.9267,
+    long: 47.9218,
+    name: 'Hope A. Atkins',
+    street: '3715 Hillcrest Drive',
+    location: 'Seattle'
+  }, {
+    lat: 23.4425,
+    long: 58.4438,
+    name: 'Samuel R. Bailey',
+    street: '2883 Raoul Wallenberg Place',
+    location: 'Cheshire'
+  }, {
+    lat: 23.5425,
+    long: 58.3438,
+    name: 'Samuel R. Bailey',
+    street: '2883 Raoul Wallenberg Place',
+    location: 'Cheshire'
+  }, {
+    lat: -37.8927369333,
+    long: 175.4087452333,
+    name: 'Samuel R. Bailey',
+    street: '3228 Glory Road',
+    location: 'Nashville'
+  }, {
+    lat: -38.9064188833,
+    long: 175.4441556833,
+    name: 'Samuel R. Bailey',
+    street: '3228 Glory Road',
+    location: 'Nashville'
+  }, {
+    lat: -12.409874,
+    long: -65.596832,
+    name: 'Ann J. Perdue',
+    street: '921 Ella Street',
+    location: 'Dublin'
+  }, {
+    lat: -22.090887,
+    long: -57.411827,
+    name: 'Jorge C. Woods',
+    street: '4800 North Bend River Road',
+    location: 'Allen'
+  }, {
+    lat: -19.019585,
+    long: -65.261963,
+    name: 'Russ E. Panek',
+    street: '4068 Hartland Avenue',
+    location: 'Appleton'
+  }, {
+    lat: -16.500093,
+    long: -68.214684,
+    name: 'Russ E. Panek',
+    street: '4068 Hartland Avenue',
+    location: 'Appleton'
+  }, {
+    lat: -17.413977,
+    long: -66.165321,
+    name: 'Russ E. Panek',
+    street: '4068 Hartland Avenue',
+    location: 'Appleton'
+  }, {
+    lat: -16.489689,
+    long: -68.119293,
+    name: 'Russ E. Panek',
+    street: '4068 Hartland Avenue',
+    location: 'Appleton'
+  }, {
+    lat: 54.766323,
+    long: 3.08603729,
+    name: 'Russ E. Panek',
+    street: '4068 Hartland Avenue',
+    location: 'Appleton'
+  }, {
+    lat: 54.866323,
+    long: 3.08603729,
+    name: 'Russ E. Panek',
+    street: '4068 Hartland Avenue',
+    location: 'Appleton'
+  }, {
+    lat: 49.537685,
+    long: 3.08603729,
+    name: 'Russ E. Panek',
+    street: '4068 Hartland Avenue',
+    location: 'Appleton'
+  }, {
+    lat: 54.715424,
+    long: 0.509207,
+    name: 'Russ E. Panek',
+    street: '4068 Hartland Avenue',
+    location: 'Appleton'
+  }, {
+    lat: 44.891666,
+    long: 10.136665,
+    name: 'Russ E. Panek',
+    street: '4068 Hartland Avenue',
+    location: 'Appleton'
+  }, {
+    lat: 48.078335,
+    long: 14.535004,
+    name: 'Russ E. Panek',
+    street: '4068 Hartland Avenue',
+    location: 'Appleton'
+  }, {
+    lat: -26.358055,
+    long: 27.398056,
+    name: 'Russ E. Panek',
+    street: '4068 Hartland Avenue',
+    location: 'Appleton'
+  }, {
+    lat: -29.100000,
+    long: 26.216700,
+    name: 'Wilbur J. Dry',
+    street: '2043 Jadewood Drive',
+    location: 'Northbrook'
+  }, {
+    lat: -29.883333,
+    long: 31.049999,
+    name: 'Wilbur J. Dry',
+    street: '2043 Jadewood Drive',
+    location: 'Northbrook'
+  }, {
+    lat: -26.266111,
+    long: 27.865833,
+    name: 'Wilbur J. Dry',
+    street: '2043 Jadewood Drive',
+    location: 'Northbrook'
+  }, {
+    lat: -29.087217,
+    long: 26.154898,
+    name: 'Wilbur J. Dry',
+    street: '2043 Jadewood Drive',
+    location: 'Northbrook'
+  }, {
+    lat: -33.958252,
+    long: 25.619022,
+    name: 'Wilbur J. Dry',
+    street: '2043 Jadewood Drive',
+    location: 'Northbrook'
+  }, {
+    lat: -33.977074,
+    long: 22.457581,
+    name: 'Wilbur J. Dry',
+    street: '2043 Jadewood Drive',
+    location: 'Northbrook'
+  }, {
+    lat: -26.563404,
+    long: 27.844164,
+    name: 'Wilbur J. Dry',
+    street: '2043 Jadewood Drive',
+    location: 'Northbrook'
+  }, {
+    lat: 51.213890,
+    long: -102.462776,
+    name: 'Joseph B. Poole',
+    street: '3364 Lunetta Street',
+    location: 'Wichita Falls'
+  }, {
+    lat: 52.321945,
+    long: -106.584167,
+    name: 'Joseph B. Poole',
+    street: '3364 Lunetta Street',
+    location: 'Wichita Falls'
+  }, {
+    lat: 50.288055,
+    long: -107.793892,
+    name: 'Joseph B. Poole',
+    street: '3364 Lunetta Street',
+    location: 'Wichita Falls'
+  }, {
+    lat: 52.757500,
+    long: -108.286110,
+    name: 'Joseph B. Poole',
+    street: '3364 Lunetta Street',
+    location: 'Wichita Falls'
+  }, {
+    lat: 50.393333,
+    long: -105.551941,
+    name: 'Joseph B. Poole',
+    street: '3364 Lunetta Street',
+    location: 'Wichita Falls'
+  }, {
+    lat: 50.930557,
+    long: -102.807777,
+    name: 'Joseph B. Poole',
+    street: '3364 Lunetta Street',
+    location: 'Wichita Falls'
+  }, {
+    lat: 52.856388,
+    long: -104.610001,
+    name: 'Joseph B. Poole',
+    street: '3364 Lunetta Street',
+    location: 'Wichita Falls'
+  }, {
+    lat: 52.289722,
+    long: -106.666664,
+    name: 'Joseph B. Poole',
+    street: '3364 Lunetta Street',
+    location: 'Wichita Falls'
+  }, {
+    lat: 52.201942,
+    long: -105.123055,
+    name: 'Joseph B. Poole',
+    street: '3364 Lunetta Street',
+    location: 'Wichita Falls'
+  }, {
+    lat: 53.278046,
+    long: -110.005470,
+    name: 'Joseph B. Poole',
+    street: '3364 Lunetta Street',
+    location: 'Wichita Falls'
+  }, {
+    lat: 49.136730,
+    long: -102.990959,
+    name: 'Joseph B. Poole',
+    street: '3364 Lunetta Street',
+    location: 'Wichita Falls'
+  }, {
+    lat: 45.484531,
+    long: -73.597023,
+    name: 'Claudette D. Nowakowski',
+    street: '3742 Farland Avenue',
+    location: 'San Antonio'
+  }, {
+    lat: 45.266666,
+    long: -71.900002,
+    name: 'Claudette D. Nowakowski',
+    street: '3742 Farland Avenue',
+    location: 'San Antonio'
+  }, {
+    lat: 45.349998,
+    long: -72.516670,
+    name: 'Claudette D. Nowakowski',
+    street: '3742 Farland Avenue',
+    location: 'San Antonio'
+  }, {
+    lat: 47.333332,
+    long: -79.433334,
+    name: 'Claudette D. Nowakowski',
+    street: '3742 Farland Avenue',
+    location: 'San Antonio'
+  }, {
+    lat: 45.400002,
+    long: -74.033333,
+    name: 'Claudette D. Nowakowski',
+    street: '3742 Farland Avenue',
+    location: 'San Antonio'
+  }, {
+    lat: 45.683334,
+    long: -73.433334,
+    name: 'Claudette D. Nowakowski',
+    street: '3742 Farland Avenue',
+    location: 'San Antonio'
+  }, {
+    lat: 48.099998,
+    long: -77.783333,
+    name: 'Claudette D. Nowakowski',
+    street: '3742 Farland Avenue',
+    location: 'San Antonio'
+  }, {
+    lat: 45.500000,
+    long: -72.316666,
+    name: 'Claudette D. Nowakowski',
+    street: '3742 Farland Avenue',
+    location: 'San Antonio'
+  }, {
+    lat: 46.349998,
+    long: -72.550003,
+    name: 'Claudette D. Nowakowski',
+    street: '3742 Farland Avenue',
+    location: 'San Antonio'
+  }, {
+    lat: 48.119999,
+    long: -69.180000,
+    name: 'Claudette D. Nowakowski',
+    street: '3742 Farland Avenue',
+    location: 'San Antonio'
+  }, {
+    lat: 45.599998,
+    long: -75.250000,
+    name: 'Claudette D. Nowakowski',
+    street: '3742 Farland Avenue',
+    location: 'San Antonio'
+  }, {
+    lat: 46.099998,
+    long: -71.300003,
+    name: 'Claudette D. Nowakowski',
+    street: '3742 Farland Avenue',
+    location: 'San Antonio'
+  }, {
+    lat: 45.700001,
+    long: -73.633331,
+    name: 'Claudette D. Nowakowski',
+    street: '3742 Farland Avenue',
+    location: 'San Antonio'
+  }, {
+    lat: 47.680000,
+    long: -68.879997,
+    name: 'Claudette D. Nowakowski',
+    street: '3742 Farland Avenue',
+    location: 'San Antonio'
+  }, {
+    lat: 46.716667,
+    long: -79.099998,
+    name: '299'
+  }, {
+    lat: 45.016666,
+    long: -72.099998,
+    name: '299'
+  }];
+  var _window3 = window,
+      L = _window3.L;
+  var mapContainer = document.getElementById('map');
+
+  if (L && mapContainer) {
+    var filterColor = ['bright:101%', 'contrast:101%', 'hue:23deg', 'saturate:225%'];
+    var tileLayerTheme = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+    var tiles;
+
+    if (storage.isDark) {
+      filterColor = ['invert:98%', 'grayscale:69%', 'bright:89%', 'contrast:111%', 'hue:205deg', 'saturate:1000%'];
+    }
+
+    if (window.is.ie()) {
+      if (storage.isDark) {
+        tileLayerTheme = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+      }
+
+      tiles = L.tileLayer(tileLayerTheme, {
+        attribution: null,
+        transparent: true
+      });
+    } else {
+      tiles = L.tileLayer.colorFilter(tileLayerTheme, {
+        attribution: null,
+        transparent: true,
+        filter: filterColor
+      });
+    }
+
+    var map = L.map('map', {
+      center: L.latLng(10.737, 0),
+      zoom: 0,
+      layers: [tiles],
+      minZoom: 1.3,
+      zoomSnap: 0.5,
+      dragging: !L.Browser.mobile,
+      tap: !L.Browser.mobile
+    });
+    var mcg = L.markerClusterGroup({
+      chunkedLoading: false,
+      spiderfyOnMaxZoom: false
+    });
+    points.map(function (point) {
+      var name = point.name,
+          location = point.location,
+          street = point.street;
+      var marker = L.marker(new L.LatLng(point.lat, point.long), {
+        name: name,
+        location: location
+      });
+      var popupContent = "\n        <h6 class=\"mb-1\">" + name + "</h6>\n        <p class=\"m-0 text-500\">" + street + ", " + location + "</p>\n      ";
+      var popup = L.popup({
+        minWidth: 180
+      }).setContent(popupContent);
+      marker.bindPopup(popup);
+      mcg.addLayer(marker);
+      return true;
+    });
+    map.addLayer(mcg);
+  }
 });
 /*-----------------------------------------------
 |   Lightbox
@@ -3698,35 +4967,132 @@ utils.$document.ready(function () {
     });
   }
 });
+/*-----------------------------------------------
+|   Lottie
+-----------------------------------------------*/
+
 window.utils.$document.ready(function () {
-  var _window3 = window,
-      utils = _window3.utils;
+  var lotties = $('.lottie');
+
+  if (lotties.length) {
+    lotties.each(function (index, value) {
+      var $this = $(value);
+      var options = $.extend({
+        container: value,
+        path: '../img/animated-icons/warning-light.json',
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        name: 'Hello World'
+      }, $this.data('options'));
+      window.bodymovin.loadAnimation(options);
+    });
+  }
+});
+/*-----------------------------------------------
+|   Modal
+-----------------------------------------------*/
+
+utils.$document.ready(function () {
+  var Selector = {
+    MODAL_THEME: '.modal-theme'
+  };
+  var DataKey = {
+    OPTIONS: 'options'
+  };
+  var Events = {
+    HIDDEN_BS_MODAL: 'hidden.bs.modal'
+  };
+  var modals = $(Selector.MODAL_THEME);
+  var showModal = true;
+
+  var getCookie = function getCookie(name) {
+    var keyValue = document.cookie.match("(^|;) ?" + name + "=([^;]*)(;|$)");
+    return keyValue ? keyValue[2] : keyValue;
+  };
+
+  var setCookie = function setCookie(name, value, expire) {
+    var expires = new Date();
+    expires.setTime(expires.getTime() + expire);
+    document.cookie = name + "=" + value + ";expires=" + expires.toUTCString();
+  };
+
+  if (modals.length) {
+    modals.each(function (index, value) {
+      var $this = $(value);
+      var userOptions = $this.data(DataKey.OPTIONS);
+      var options = $.extend({
+        autoShow: false,
+        autoShowDelay: 0,
+        showOnce: false
+      }, userOptions);
+
+      if (options.showOnce) {
+        var modal = getCookie('modal');
+        showModal = modal === null;
+      }
+
+      if (options.autoShow && showModal) {
+        setTimeout(function () {
+          $this.modal('show');
+        }, options.autoShowDelay);
+      }
+    });
+  }
+
+  $(Selector.MODAL_THEME).on(Events.HIDDEN_BS_MODAL, function (e) {
+    var $this = $(e.currentTarget);
+    var userOptions = $this.data(DataKey.OPTIONS);
+    var options = $.extend({
+      cookieExpireTime: 7200000,
+      showOnce: false
+    }, userOptions);
+    options.showOnce && setCookie('modal', false, options.cookieExpireTime);
+  });
+});
+/*-----------------------------------------------
+|   Navbar
+-----------------------------------------------*/
+
+window.utils.$document.ready(function () {
+  var _window4 = window,
+      utils = _window4.utils;
   var $window = utils.$window,
       breakpoints = utils.breakpoints;
   var navDropShadowFlag = true;
-  var CLASS_NAME = {
-    navbarGlassShadow: 'navbar-glass-shadow',
-    collapsed: 'collapsed'
+  var ClassName = {
+    SHOW: 'show',
+    NAVBAR_GLASS_SHADOW: 'navbar-glass-shadow',
+    NAVBAR_VERTICAL_COLLAPSED: 'navbar-vertical-collapsed',
+    NAVBAR_VERTICAL_COLLAPSE_HOVER: 'navbar-vertical-collapsed-hover'
   };
-  var SELECTOR = {
-    navbar: '.navbar:not(.navbar-vertical)',
-    navbarVertical: '.navbar-vertical',
-    navbarToggler: '.navbar-toggler',
-    navbarVerticalCollapse: '#navbarVerticalCollapse'
+  var Selector = {
+    HTML: 'html',
+    NAVBAR: '.navbar:not(.navbar-vertical)',
+    NAVBAR_VERTICAL: '.navbar-vertical',
+    NAVBAR_VERTICAL_TOGGLE: '.navbar-vertical-toggle',
+    NAVBAR_VERTICAL_COLLAPSE: '#navbarVerticalCollapse',
+    NAVBAR_VERTICAL_COLLAPSED: '.navbar-vertical-collapsed',
+    NAVBAR_VERTICAL_DROPDOWN_NAV: '.navbar-vertical .navbar-collapse .nav',
+    NAVBAR_VERTICAL_COLLAPSED_DROPDOWN_NAV: '.navbar-vertical-collapsed .navbar-vertical .navbar-collapse .nav',
+    MAIN_CONTENT: '.main .content',
+    NAVBAR_TOP: '.navbar-top',
+    OWL_CAROUSEL: '.owl-carousel',
+    ECHART_RESPONSIVE: '[data-echart-responsive]'
   };
-  var $navbar = $(SELECTOR.navbar);
-  var $navbarVerticalCollapse = $(SELECTOR.navbarVerticalCollapse);
-
-  var setDropShadow = function setDropShadow($elem) {
-    if ($elem.scrollTop() > 0 && navDropShadowFlag) {
-      $navbar.addClass(CLASS_NAME.navbarGlassShadow);
-    } else {
-      $navbar.removeClass(CLASS_NAME.navbarGlassShadow);
-    }
+  var Events = {
+    LOAD_SCROLL: 'load scroll',
+    SCROLL: 'scroll',
+    CLICK: 'click',
+    RESIZE: 'resize',
+    SHOW_BS_COLLAPSE: 'show.bs.collapse',
+    HIDDEN_BS_COLLAPSE: 'hidden.bs.collapse'
   };
-
+  var $html = $(Selector.HTML);
+  var $navbar = $(Selector.NAVBAR);
+  var $navbarVerticalCollapse = $(Selector.NAVBAR_VERTICAL_COLLAPSE);
   var breakPoint;
-  var navbarVerticalClass = $(SELECTOR.navbarVertical).attr('class');
+  var navbarVerticalClass = $(Selector.NAVBAR_VERTICAL).attr('class');
 
   if (navbarVerticalClass) {
     breakPoint = breakpoints[navbarVerticalClass.split(' ').filter(function (cls) {
@@ -3734,27 +5100,82 @@ window.utils.$document.ready(function () {
     }).pop().split('-').pop()];
   }
 
-  $window.on('load scroll', function () {
+  var setDropShadow = function setDropShadow($elem) {
+    if ($elem.scrollTop() > 0 && navDropShadowFlag) {
+      $navbar.addClass(ClassName.NAVBAR_GLASS_SHADOW);
+    } else {
+      $navbar.removeClass(ClassName.NAVBAR_GLASS_SHADOW);
+    }
+  };
+
+  $window.on(Events.LOAD_SCROLL, function () {
     return setDropShadow($window);
   });
-  $navbarVerticalCollapse.on('scroll', function () {
+  $navbarVerticalCollapse.on(Events.SCROLL, function () {
     navDropShadowFlag = true;
     setDropShadow($navbarVerticalCollapse);
   });
-  $navbarVerticalCollapse.on('show.bs.collapse', function () {
+  $navbarVerticalCollapse.on(Events.SHOW_BS_COLLAPSE, function () {
     if ($window.width() < breakPoint) {
       navDropShadowFlag = false;
       setDropShadow($window);
     }
   });
-  $navbarVerticalCollapse.on('hide.bs.collapse', function () {
-    if ($navbarVerticalCollapse.hasClass('show') && $window.width() < breakPoint) {
+  $navbarVerticalCollapse.on(Events.HIDDEN_BS_COLLAPSE, function () {
+    if ($navbarVerticalCollapse.hasClass(ClassName.SHOW) && $window.width() < breakPoint) {
       navDropShadowFlag = false;
     } else {
       navDropShadowFlag = true;
     }
 
     setDropShadow($window);
+  }); // Expand or Collapse vertical navbar on mouse over and out
+
+  $navbarVerticalCollapse.hover(function (e) {
+    setTimeout(function () {
+      if ($(e.currentTarget).is(':hover')) {
+        $(Selector.NAVBAR_VERTICAL_COLLAPSED).addClass(ClassName.NAVBAR_VERTICAL_COLLAPSE_HOVER);
+      }
+    }, 100);
+  }, function () {
+    $(Selector.NAVBAR_VERTICAL_COLLAPSED).removeClass(ClassName.NAVBAR_VERTICAL_COLLAPSE_HOVER);
+  }); // Set navbar top width from content
+
+  var setNavbarWidth = function setNavbarWidth() {
+    var contentWidth = $(Selector.MAIN_CONTENT).width() + 30;
+    $(Selector.NAVBAR_TOP).outerWidth(contentWidth);
+  }; // Toggle navbar vertical collapse on click
+
+
+  $(document).on(Events.CLICK, Selector.NAVBAR_VERTICAL_TOGGLE, function () {
+    // Set collapse state on localStorage
+    var isNavbarVerticalCollapsed = JSON.parse(localStorage.getItem('isNavbarVerticalCollapsed'));
+    localStorage.setItem('isNavbarVerticalCollapsed', !isNavbarVerticalCollapsed); // Toggle class
+
+    $html.toggleClass(ClassName.NAVBAR_VERTICAL_COLLAPSED); // Set navbar top width
+
+    setNavbarWidth(); // Refresh owlCarousel
+
+    var $owlCarousel = $(Selector.OWL_CAROUSEL);
+
+    if ($owlCarousel.length) {
+      $owlCarousel.owlCarousel('refresh');
+    } // Refresh Echarts
+
+
+    var $echarts = document.querySelectorAll(Selector.ECHART_RESPONSIVE);
+
+    if ($echarts.length) {
+      $.each($echarts, function (item, value) {
+        if ($(value).data('echart-responsive')) {
+          window.echarts.init(value).resize();
+        }
+      });
+    }
+  }); // Set navbar top width on window resize
+
+  $window.on(Events.RESIZE, function () {
+    setNavbarWidth();
   });
 });
 /*-----------------------------------------------
@@ -3829,7 +5250,7 @@ utils.$document.ready(function () {
   }
 });
 /*-----------------------------------------------
-|   Smooth Scrollbar
+|   Perfect Scrollbar
 -----------------------------------------------*/
 
 window.utils.$document.ready(function () {
@@ -4006,7 +5427,7 @@ utils.$document.ready(function () {
   }
 });
 /*-----------------------------------------------
-|   Toastr
+|   Raty
 -----------------------------------------------*/
 
 window.utils.$document.ready(function () {
@@ -4025,6 +5446,18 @@ window.utils.$document.ready(function () {
       $(value).raty(options);
     });
   }
+});
+/*-----------------------------------------------
+|   Select2
+-----------------------------------------------*/
+
+window.utils.$document.ready(function () {
+  var select2 = $('.selectpicker');
+  select2.length && select2.each(function (index, value) {
+    var $this = $(value);
+    var options = $.extend({}, $this.data('options'));
+    $this.select2(options);
+  });
 });
 /*
   global Stickyfill
@@ -4136,7 +5569,7 @@ utils.$document.ready(function () {
   });
 });
 /*-----------------------------------------------
-|   CKEditor | WYSIWYG
+|   TINYMCE
 -----------------------------------------------*/
 
 window.utils.$document.ready(function () {
@@ -4165,7 +5598,7 @@ window.utils.$document.ready(function () {
   });
 });
 /*-----------------------------------------------
-|   Tabs
+|   Toast [bootstrap 4]
 -----------------------------------------------*/
 
 utils.$document.ready(function () {
@@ -4178,8 +5611,8 @@ utils.$document.ready(function () {
 window.utils.$document.ready(function () {
   var $notifications = $('[data-notification]');
   $notifications.each(function (index, value) {
-    var _window4 = window,
-        toastr = _window4.toastr;
+    var _window5 = window,
+        toastr = _window5.toastr;
     var $this = $(value);
     var config = $this.data('notification');
     var defaultOptions = {

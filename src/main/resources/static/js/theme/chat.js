@@ -2,7 +2,7 @@
 |   Chat
 -----------------------------------------------*/
 window.utils.$document.ready(() => {
-
+  
   const Event = { 
     CLICK: 'click',
     SHOWN_BS_TAB: 'shown.bs.tab',
@@ -97,7 +97,6 @@ window.utils.$document.ready(() => {
     setScrollbarPosition($chatArea);
     
   });
-
 
   // Detect keyup event on EmojioneArea Editor
   if($chatEmojiarea.length){

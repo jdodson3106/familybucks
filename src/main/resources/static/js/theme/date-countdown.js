@@ -14,6 +14,7 @@ utils.$document.ready(() => {
 
   if ($dataCountdowns.length) {
     $dataCountdowns.each((index, value) => {
+      
       const $dateCountdown = $(value);
       const date = $dateCountdown.data(DATA_KEY.COUNTDOWN);
       let fallback;

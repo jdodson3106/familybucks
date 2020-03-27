@@ -34,6 +34,7 @@ utils.$document.ready(() => {
       let playCountUpTriggered = false;
       const countUP = () => {
         if (utils.isScrolledIntoView(value) && !playCountUpTriggered) {
+          
           if (!playCountUpTriggered) {
             $({ countNum: 0 }).animate(
               { countNum: counter.count },

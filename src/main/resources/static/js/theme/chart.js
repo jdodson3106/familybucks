@@ -1,6 +1,6 @@
 'use strict';
 
-import storage from './config'
+import storage from './config.dark-mode'
 
 /*-----------------------------------------------
 |   Chart

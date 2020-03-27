@@ -3,7 +3,7 @@
 import utils from './Utils';
 
 /*-----------------------------------------------
-|   Tabs
+|   Toast [bootstrap 4]
 -----------------------------------------------*/
 utils.$document.ready(() => {
   $('.toast').toast();

@@ -1,68 +1,55 @@
 'use strict';
 
-import storage from './config'
-
 /*-----------------------------------------------
 |   Demo mode
 -----------------------------------------------*/
-const setItem = (key, value) => localStorage.setItem(key, !value);
 
 window.utils.$document.ready(() => {
   const { utils, location } = window;
-  const { isDark, isRTL, isFluid } = storage;
 
-  const Event = {
-    CHANGE: 'change'
-  }
-  const ClassName = { 
-    CONTAINER: 'container',
-    CONTAINER_FLUID: 'container-fluid',
-  }
+  const Event = { CHANGE: 'change' }
+
   const Selector = {
-    DATALAYOUT: '[data-layout]',
-    BODY: 'body',
-    DARK: '#dark',
-    RTL: '#rtl',
-    FLUID: '#fluid',
-    THEMESTYLE: '#theme-style',
-    STYLE: '.style'
+    RTL: '#mode-rtl',
+    FLUID: '#mode-fluid',
+    INPUT_NAVBAR: "input[name='navbar']",
+    INPUT_COLOR_SCHEME: "input[name='colorScheme']"
   }
-  const Attribute = { 
-    DIR: 'dir',
-    DISABLED: 'disabled'
-  };
 
-  const handleChange = (selector, key, value) => {
-    utils.$document.on(Event.CHANGE, selector, () => {
-      setItem(key, value);
-      location.reload();
+  const DATA_KEY = { 
+    URL: 'url',
+    HOME_URL: 'home-url',
+    PAGE_URL: 'page-url',
+  }
+
+  // Redirect on Checkbox change
+  const handleChange = (selector) => {
+    utils.$document.on(Event.CHANGE, selector, (e) => {
+      const $this = $(e.currentTarget);
+      const isChecked = $this.prop('checked');
+      if(isChecked){
+        const url = $this.data(DATA_KEY.URL);
+        location.replace(url);
+      }else{
+        const homeUrl = $this.data(DATA_KEY.HOME_URL);
+        location.replace(homeUrl);
+      }
+
     });
   }
 
-  const disabledAllStyles = () => {
-    $(Selector.STYLE).each(function disabledStyles() {
-      $(this).attr(Attribute.DISABLED, true);
-    });
-  };
-
-  const $dataLayout = $(Selector.DATALAYOUT);
-
-  // Fluid mode controler
-  if(isFluid) {
-    $dataLayout.addClass(ClassName.CONTAINER_FLUID).removeClass(ClassName.CONTAINER);
-  } else {
-    $dataLayout.addClass(ClassName.CONTAINER).removeClass(ClassName.CONTAINER_FLUID);
+  const handleInputChange = (selector) => {
+    utils.$document.on(Event.CHANGE, selector, (e) => {
+      const $this = $(e.currentTarget);
+      const pageUrl = $this.data(DATA_KEY.PAGE_URL);
+      location.replace(pageUrl);
+    })
   }
-
-  // Dark and RTL mode controler
-  disabledAllStyles();
-  utils.$html.attr(Attribute.DIR, isRTL ? 'rtl' : 'ltr');
-  $(`${Selector.THEMESTYLE}${isDark ? '-dark' : ''}${isRTL ? '-rtl' : ''}`).removeAttr(Attribute.DISABLED);
-
-  $(Selector.BODY).css('display', 'block');
-
+  
   // Mode checkbox handler
-  handleChange(Selector.DARK, 'isDark', isDark);
-  handleChange(Selector.FLUID, 'isFluid', isFluid);
-  handleChange(Selector.RTL, 'isRTL', isRTL);
+  handleChange(Selector.RTL);
+  handleChange(Selector.FLUID);
+  handleInputChange(Selector.INPUT_NAVBAR);
+  handleInputChange(Selector.INPUT_COLOR_SCHEME);
+
 });

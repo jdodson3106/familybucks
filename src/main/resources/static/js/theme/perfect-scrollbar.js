@@ -1,9 +1,10 @@
 import PerfectScrollbar from "../../pages/assets/lib/perfect-scrollbar/perfect-scrollbar";
 
 /*-----------------------------------------------
-|   Smooth Scrollbar
+|   Perfect Scrollbar
 -----------------------------------------------*/
 window.utils.$document.ready(() => {
+
   if(window.is.ie() || window.is.edge()){
     const scrollbars = document.querySelectorAll('.perfect-scrollbar');
     if(scrollbars.length){

@@ -1,5 +1,7 @@
 'use strict';
 
+import storage from './config.dark-mode';
+
 /*-----------------------------------------------
 |   Gooogle Map
 -----------------------------------------------*/
@@ -8,6 +10,7 @@
 */
 function initMap() {
   const $googlemaps = $('.googlemap');
+  const { isDark } = storage;
   if ($googlemaps.length) {
     // Visit https://snazzymaps.com/ for more themes
     const mapStyles = {
@@ -417,7 +420,7 @@ function initMap() {
       const markerPopup = $googlemap.html();
       const icon = ($googlemap.data('icon')) ? $googlemap.data('icon') : 'https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi.png';
       const zoom = $googlemap.data('zoom');
-      const mapStyle = $googlemap.data('theme');
+      const mapStyle = isDark ? 'Midnight' : $googlemap.data('theme');
       const mapElement = value;
 
 

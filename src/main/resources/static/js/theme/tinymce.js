@@ -1,7 +1,7 @@
 import utils from "./Utils";
 
 /*-----------------------------------------------
-|   CKEditor | WYSIWYG
+|   TINYMCE
 -----------------------------------------------*/
 window.utils.$document.ready(() => {
 
