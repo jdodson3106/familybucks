@@ -1,5 +1,6 @@
 package com.justindodson.familybucks.accounts.web.controller;
 
+import com.justindodson.familybucks.CustomMessages;
 import com.justindodson.familybucks.accounts.auth.User;
 import com.justindodson.familybucks.accounts.model.entity.user.Child;
 import com.justindodson.familybucks.accounts.model.entity.user.Parent;
@@ -18,14 +19,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.net.URI;
 import java.security.Principal;
-import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 @Controller
 @RequestMapping("/parents")
@@ -108,7 +106,7 @@ public class ParentController {
     }
 
     @PostMapping("/new-product")
-    public String addProductProcessor(@ModelAttribute("product") Product product, Principal principal) {
+    public String addProductProcessor(@ModelAttribute("product") Product product, Principal principal, RedirectAttributes attributes) {
         User currentUser = parentService.getParentByUsername(principal.getName());
         product.setOwnerID(currentUser.getId());
 
@@ -117,15 +115,15 @@ public class ParentController {
         HttpEntity<Product> entity = new HttpEntity<>(product, headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:8080/api/products/new";
+        String url = SERVICEURL + "/api/products/new";
 
         try {
             Product product1 = restTemplate.postForObject(new URI(url), entity, Product.class);
-//            LOGGER.info("Created product: " + product1.getName());
+            attributes.addFlashAttribute(CustomMessages.SUCCESS, CustomMessages.PRODUCT_CREATION_SUCCESS_MESSAGE + " " + product1.getName());
             return "redirect:/dashboard";
         }
         catch(Exception e) {
-            LOGGER.error("Error creating product: " + product);
+            LOGGER.error(CustomMessages.PRODUCT_CREATION_ERROR_MESSAGE + " " + product);
             e.printStackTrace();
             return "users/add_product";
         }

@@ -1,14 +1,12 @@
 package com.justindodson.familybucks.products.web.restcontroller;
 
-import com.justindodson.familybucks.CustomResponses;
+import com.justindodson.familybucks.CustomMessages;
 import com.justindodson.familybucks.products.model.entity.Product;
 import com.justindodson.familybucks.products.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,12 +29,12 @@ public class ProductController {
         LOGGER.info("New Project Post Mapping Called");
         Map<String, String> messageMap = new HashMap<>();
         if(product != null){
-            LOGGER.info(CustomResponses.SUCCESS);
+            LOGGER.info(CustomMessages.SUCCESS);
             Product returnProduct = productService.createOrUpdateProduct(product);
-            messageMap.put(CustomResponses.SUCCESS, "product " + product.getName() +  " successfully created");
+            messageMap.put(CustomMessages.SUCCESS, "product " + product.getName() +  " successfully created");
         } else {
-            LOGGER.error(CustomResponses.ERROR);
-            messageMap.put(CustomResponses.ERROR, "Could not create null product");
+            LOGGER.error(CustomMessages.ERROR);
+            messageMap.put(CustomMessages.ERROR, "Could not create null product");
         }
         return product;
     }
