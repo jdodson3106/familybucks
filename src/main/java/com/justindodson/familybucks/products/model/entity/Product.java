@@ -1,6 +1,5 @@
 package com.justindodson.familybucks.products.model.entity;
 
-import com.justindodson.familybucks.accounts.auth.User;
 
 import javax.persistence.*;
 
@@ -57,6 +56,10 @@ public class Product {
 
     public void setOwnerID(long ownerID) {
         this.ownerID = ownerID;
+    }
+
+    public String getNameForUri() {
+        return this.getName().replaceAll(" ", "-");
     }
 
     @Override

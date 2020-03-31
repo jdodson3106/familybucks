@@ -14,13 +14,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
-public class ProductController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProductController.class);
+public class ProductRestController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductRestController.class);
 
     private final ProductService productService;
 
     @Autowired
-    public ProductController(ProductService productService) {
+    public ProductRestController(ProductService productService) {
         this.productService = productService;
     }
 

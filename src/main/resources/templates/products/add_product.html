@@ -4,9 +4,8 @@
 </head>
 <body>
 
-<div th:replace="fragments/base :: navbar"></div>
     <div class="container">
-        <form th:action="@{/parents/new-product}"  th:object="${product}" method="post">
+        <form th:action="@{/products/create-product}"  th:object="${product}" method="post">
             <div class="form-group">
                 <label for="product_name">Product Name</label>
                 <input class="form-control" id="product_name" type="text" placeholder="Product Name" th:field="*{name}">

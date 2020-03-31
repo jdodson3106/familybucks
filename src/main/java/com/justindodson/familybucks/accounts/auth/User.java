@@ -13,6 +13,8 @@ import java.util.Comparator;
 @DiscriminatorValue(value = "user")
 public abstract class User extends BaseEntity {
 
+    // TODO: 3/31/20 Add profile image section
+
     @Column(name = "first_name")
     @NotEmpty
     private String firstName;

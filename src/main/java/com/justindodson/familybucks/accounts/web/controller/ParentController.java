@@ -8,6 +8,7 @@ import com.justindodson.familybucks.accounts.service.ChildService;
 import com.justindodson.familybucks.accounts.service.FamilyService;
 import com.justindodson.familybucks.accounts.service.ParentService;
 import com.justindodson.familybucks.products.model.entity.Product;
+import com.justindodson.familybucks.products.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,12 +37,14 @@ public class ParentController {
     private final ParentService parentService;
     private final ChildService childService;
     private final FamilyService familyService;
+    private final ProductService productService;
 
     @Autowired
-    public ParentController(ParentService parentService, ChildService childService, FamilyService familyService) {
+    public ParentController(ParentService parentService, ChildService childService, FamilyService familyService, ProductService productService) {
         this.parentService = parentService;
         this.childService = childService;
         this.familyService = familyService;
+        this.productService = productService;
     }
 
     // TODO: 3/20/20 !!!TESTING ONLY!!!: REMOVE THIS MAPPING TO SEE ALL PARENTS IN THE SYSTEM
@@ -95,37 +98,5 @@ public class ParentController {
         child = childService.addChildToFamily(child, currentUser.getFamily());
         childService.createOrUpdateChild(child);
         return "redirect:/parents/my-family";
-    }
-
-    @GetMapping("/new-product")
-    public String addProductView(Model model) {
-        LOGGER.info("In the addProductView() method" );
-        Product product = new Product();
-        model.addAttribute("product", product);
-        return "users/add_product";
-    }
-
-    @PostMapping("/new-product")
-    public String addProductProcessor(@ModelAttribute("product") Product product, Principal principal, RedirectAttributes attributes) {
-        User currentUser = parentService.getParentByUsername(principal.getName());
-        product.setOwnerID(currentUser.getId());
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Product> entity = new HttpEntity<>(product, headers);
-
-        RestTemplate restTemplate = new RestTemplate();
-        String url = SERVICEURL + "/api/products/new";
-
-        try {
-            Product product1 = restTemplate.postForObject(new URI(url), entity, Product.class);
-            attributes.addFlashAttribute(CustomMessages.SUCCESS, CustomMessages.PRODUCT_CREATION_SUCCESS_MESSAGE + " " + product1.getName());
-            return "redirect:/dashboard";
-        }
-        catch(Exception e) {
-            LOGGER.error(CustomMessages.PRODUCT_CREATION_ERROR_MESSAGE + " " + product);
-            e.printStackTrace();
-            return "users/add_product";
-        }
     }
 }
